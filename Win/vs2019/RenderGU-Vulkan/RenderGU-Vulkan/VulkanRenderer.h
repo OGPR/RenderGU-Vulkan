@@ -5,6 +5,7 @@
 
 #include <stdexcept>
 #include <vector>
+#include "Utilities.h"
 
 struct VulkanRenderer
 {
@@ -12,9 +13,21 @@ struct VulkanRenderer
 	int init(GLFWwindow* window);
 	void cleanup();
 	bool checkInstanceExtensionSupport(std::vector<const char*>* checkExtensions);
+	bool checkDeviceSuitable(VkPhysicalDevice device);
+	
 
 
 	GLFWwindow* window;
 	VkInstance instance;
+
+	struct
+	{
+		VkPhysicalDevice physicalDevice;
+		VkDevice logicalDevice;
+	} mainDevice;
+
+	void getPhysicalDevice();
+	QueueFamilyIndices getQueueFamilies(VkPhysicalDevice device);
+
 };
 

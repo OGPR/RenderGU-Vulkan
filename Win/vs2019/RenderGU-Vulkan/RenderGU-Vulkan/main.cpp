@@ -20,9 +20,6 @@ int main()
     }
 
     
-
-
-    
     if (!window)
     {
         std::cout << "Window is nullptr, exiting" << std::endl;

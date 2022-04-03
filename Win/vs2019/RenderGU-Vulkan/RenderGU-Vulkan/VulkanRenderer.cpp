@@ -7,6 +7,7 @@ int VulkanRenderer::init(GLFWwindow* window)
 
 	createInstance();
 	getPhysicalDevice();
+	createLogicalDevice();
 
 	return 0;
 }
@@ -115,6 +116,44 @@ void VulkanRenderer::getPhysicalDevice()
 			break;
 		}
 	}
+}
+
+void VulkanRenderer::createLogicalDevice()
+{
+	// Specify the queues the logical device needs to create
+	QueueFamilyIndices queueIndicies = getQueueFamilies(mainDevice.physicalDevice);
+	if (!queueIndicies.isValid())
+		throw std::runtime_error("Queue index not valid!");
+
+	VkDeviceQueueCreateInfo queueCreateInfo = {};
+	queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+	queueCreateInfo.queueFamilyIndex = queueIndicies.graphicsFamily;
+	queueCreateInfo.queueCount = 1;
+	float priority = 1.0f;
+	queueCreateInfo.pQueuePriorities = &priority;
+
+	VkPhysicalDeviceFeatures physicalDeviceFeatures = {};
+
+
+	VkDeviceCreateInfo logicalDeviceCreateInfo;
+	logicalDeviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+	logicalDeviceCreateInfo.queueCreateInfoCount = 1;
+	logicalDeviceCreateInfo.pQueueCreateInfos = &queueCreateInfo;
+	logicalDeviceCreateInfo.enabledExtensionCount = 0; //device does not care about glfw (e.g), only instance does
+	logicalDeviceCreateInfo.ppEnabledExtensionNames = nullptr;
+	logicalDeviceCreateInfo.pEnabledFeatures = &physicalDeviceFeatures;
+
+	VkResult result = vkCreateDevice(
+		mainDevice.physicalDevice,
+		&logicalDeviceCreateInfo,
+		nullptr,
+		&mainDevice.logicalDevice);
+
+	if (result != VK_SUCCESS)
+	{
+		throw std::runtime_error("Failed to create a logical device");
+	}
+
 
 }
 
@@ -162,5 +201,4 @@ void VulkanRenderer::createInstance()
 	}
 
 	// ---- End CreateInstance ----
-
 }

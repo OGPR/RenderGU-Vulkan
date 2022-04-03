@@ -27,6 +27,7 @@ struct VulkanRenderer
 	} mainDevice;
 
 	void getPhysicalDevice();
+	void createLogicalDevice();
 	QueueFamilyIndices getQueueFamilies(VkPhysicalDevice device);
 
 };

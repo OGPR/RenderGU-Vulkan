@@ -135,7 +135,7 @@ void VulkanRenderer::createLogicalDevice()
 	VkPhysicalDeviceFeatures physicalDeviceFeatures = {};
 
 
-	VkDeviceCreateInfo logicalDeviceCreateInfo;
+	VkDeviceCreateInfo logicalDeviceCreateInfo = {};
 	logicalDeviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
 	logicalDeviceCreateInfo.queueCreateInfoCount = 1;
 	logicalDeviceCreateInfo.pQueueCreateInfos = &queueCreateInfo;

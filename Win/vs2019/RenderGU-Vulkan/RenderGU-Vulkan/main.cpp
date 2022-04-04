@@ -1,38 +1,37 @@
-#define GLFW_INCLUDE_VULKAN // This includes vulkan 
-#include <GLFW/glfw3.h>
-
-#define GLM_FORCE_RADIANS
-#define GLM_FORCE_DEPTH_ZERO_TO_ONE
-#include <glm/glm.hpp>
-#include <glm/mat4x4.hpp>
-
 #include <iostream>
-#include <assert.h>
-
+#include "VulkanWindow.h"
+#include "VulkanRenderer.h"
+#include <stdexcept>
+VulkanWindow vulkanWindow;
+VulkanRenderer vulkanRenderer;
 int main()
 {
-    glfwInit();
+    GLFWwindow* window = vulkanWindow.init("RenderGU_Windows", 800, 600);
 
-    glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API); // NO_API so we set up glfw window for Vulkan
-    auto window = glfwCreateWindow(800, 600, "RenderGU-Vulkan", nullptr, nullptr);
+    try
+    {
+		vulkanRenderer.init(window);
+    }
+    catch (const std::exception& e)
+    {
+        std::cout << "std::exception caught. Message:" << std::endl;
+        std::cout << e.what() << std::endl;
+        return EXIT_FAILURE;
+    }
 
-    uint32_t extensionCount = 0;
-    vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
-    assert(extensionCount > 0);
-
-    std::cout << "Extension count: " << extensionCount << std::endl;
-
-    // Test GLM
-    glm::mat4 IMat(1.0f);
-    glm::vec4 Vec(1.0f);
-    auto result = IMat * Vec;
-    // End Test GLM
-        
+    
+    if (!window)
+    {
+        std::cout << "Window is nullptr, exiting" << std::endl;
+        return EXIT_FAILURE;
+    }
 
     while (!glfwWindowShouldClose(window))
     {
         glfwPollEvents();
     }
+
+    vulkanRenderer.cleanup();
 
     glfwDestroyWindow(window);
 

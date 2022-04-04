@@ -14,7 +14,9 @@ int VulkanRenderer::init(GLFWwindow* window)
 
 void VulkanRenderer::cleanup()
 {
+	vkDestroyDevice(mainDevice.logicalDevice, nullptr);
 	vkDestroyInstance(this->instance, nullptr);
+
 }
 
 bool VulkanRenderer::checkInstanceExtensionSupport(std::vector<const char*>* checkExtensions)
@@ -154,7 +156,7 @@ void VulkanRenderer::createLogicalDevice()
 		throw std::runtime_error("Failed to create a logical device");
 	}
 
-
+	vkGetDeviceQueue(mainDevice.logicalDevice, queueIndicies.graphicsFamily, 0, &graphicsQueue);
 }
 
 void VulkanRenderer::createInstance()

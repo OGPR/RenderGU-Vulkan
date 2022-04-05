@@ -27,10 +27,24 @@ struct VulkanRenderer
 	} mainDevice;
 
 	VkQueue graphicsQueue;
+	const char* validationLayer = "VK_LAYER_KHRONOS_validation";
+
+
+
+
 
 	void getPhysicalDevice();
 	void createLogicalDevice();
 	QueueFamilyIndices getQueueFamilies(VkPhysicalDevice device);
+
+	// Validation Layers code
+	#ifdef NDEBUG
+		const bool validationLayers = false;
+	#else
+		const bool validationLayers = true;
+	#endif
+
+	bool validationLayerSupport();
 
 };
 

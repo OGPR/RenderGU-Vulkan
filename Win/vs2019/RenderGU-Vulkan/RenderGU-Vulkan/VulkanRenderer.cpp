@@ -161,6 +161,10 @@ void VulkanRenderer::createLogicalDevice()
 
 void VulkanRenderer::createInstance()
 {
+	if (validationLayer && !validationLayerSupport())
+		throw std::runtime_error("Validation layers requested,"
+			"but specified layer was not found");
+
 	// ---- Begin AppInfo ----
 	VkApplicationInfo appInfo = {};
 	appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
@@ -203,4 +207,25 @@ void VulkanRenderer::createInstance()
 	}
 
 	// ---- End CreateInstance ----
+}
+
+// Validation Layer code
+bool VulkanRenderer::validationLayerSupport()
+{
+	uint32_t numLayers = 0;
+	vkEnumerateInstanceLayerProperties(&numLayers, nullptr);
+
+	std::vector<VkLayerProperties> availableLayers(numLayers);
+	vkEnumerateInstanceLayerProperties(&numLayers, availableLayers.data());
+
+	// TODO - could continue to run, and just report that we won't be using v layers.
+	if (!availableLayers.size())
+		throw std::runtime_error("There are no avaliable validation layers"); 
+
+	for (const VkLayerProperties& layerProperties : availableLayers)
+	{
+		if (strcmp(this->validationLayer, layerProperties.layerName) == 0)
+			return true;
+	}
+	return false;
 }

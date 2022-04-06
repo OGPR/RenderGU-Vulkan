@@ -14,7 +14,7 @@ int VulkanRenderer::init(GLFWwindow* window)
 
 void VulkanRenderer::cleanup()
 {
-	vkDestroyDevice(mainDevice.logicalDevice, nullptr);
+	//vkDestroyDevice(mainDevice.logicalDevice, nullptr);
 	vkDestroyInstance(this->instance, nullptr);
 
 }

@@ -194,8 +194,8 @@ void VulkanRenderer::createInstance()
 	VkInstanceCreateInfo createInfo = {};
 	createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
 	createInfo.pApplicationInfo = &appInfo;
-	createInfo.enabledLayerCount = 0;
-	createInfo.ppEnabledLayerNames = nullptr;
+	createInfo.enabledLayerCount = this->validationLayers ? 1 : 0;
+	createInfo.ppEnabledLayerNames = this->validationLayers ?  &this->validationLayer : nullptr;
 	createInfo.enabledExtensionCount = static_cast<uint32_t>(instanceExtensionList.size());
 	createInfo.ppEnabledExtensionNames = instanceExtensionList.data();
 	// ---- End CreateInfo ----

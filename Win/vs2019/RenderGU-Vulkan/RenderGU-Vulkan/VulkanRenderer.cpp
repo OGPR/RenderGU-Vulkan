@@ -6,6 +6,7 @@ int VulkanRenderer::init(GLFWwindow* window)
 	this->window = window;
 
 	createInstance();
+	setupDebugMessenger();
 	getPhysicalDevice();
 	createLogicalDevice();
 
@@ -14,7 +15,11 @@ int VulkanRenderer::init(GLFWwindow* window)
 
 void VulkanRenderer::cleanup()
 {
-	//vkDestroyDevice(mainDevice.logicalDevice, nullptr);
+	if (this->validationLayers)
+	{
+		destroyDebugMessenger();
+	}
+	vkDestroyDevice(mainDevice.logicalDevice, nullptr);
 	vkDestroyInstance(this->instance, nullptr);
 
 }
@@ -184,6 +189,11 @@ void VulkanRenderer::createInstance()
 	for (size_t i = 0; i < glfwExtensionCount; i++)
 	{
 		instanceExtensionList.push_back(glfwExtensionArray[i]);
+	}
+
+	if (this->validationLayers)
+	{
+		instanceExtensionList.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
 	}
 
 	if (!checkInstanceExtensionSupport(&instanceExtensionList))

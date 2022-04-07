@@ -208,6 +208,20 @@ void VulkanRenderer::createInstance()
 	createInfo.ppEnabledLayerNames = this->validationLayers ?  &this->validationLayer : nullptr;
 	createInfo.enabledExtensionCount = static_cast<uint32_t>(instanceExtensionList.size());
 	createInfo.ppEnabledExtensionNames = instanceExtensionList.data();
+
+	VkDebugUtilsMessengerCreateInfoEXT createDebugMsgInfo = {};
+	createDebugMsgInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
+	createDebugMsgInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT
+		| VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT
+		| VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
+	createDebugMsgInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT
+		| VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT
+		| VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
+	createDebugMsgInfo.pfnUserCallback = debugCallback;
+	createDebugMsgInfo.pUserData = nullptr;
+
+	createInfo.pNext = this->validationLayers ?
+		(VkDebugUtilsMessengerCreateInfoEXT*)&createDebugMsgInfo : nullptr;
 	// ---- End CreateInfo ----
 
 	// ---- Begin CreateInstance ----

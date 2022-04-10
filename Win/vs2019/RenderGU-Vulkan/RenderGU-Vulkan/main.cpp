@@ -4,8 +4,39 @@
 #include <stdexcept>
 VulkanWindow vulkanWindow;
 VulkanRenderer vulkanRenderer;
-int main()
+int main(int argc, char** argv)
 {
+    //---START CL ARGS ---//
+    if (argc == 1)
+    {
+        // no extra args passed - Default behaviour
+    }
+    else if (argc > 1)
+    {
+        // We have some work to do!
+        for (short unsigned i = 2; i <= argc; ++i)
+        {
+            char* NextArgStr = *(argv + (i - 1));
+
+			if (*NextArgStr != '-')
+				break;
+			if (*(NextArgStr + 1) == '-')
+			{
+				std::cout << "Long form for args not supported" << std::endl;
+				break;
+			}
+			// Okay, dealt with initial format, now matching chars
+			if (*(NextArgStr + 1) == 'h')
+			{
+				std::cout << "Help requested!" << std::endl;
+				// We don't continue to run, help asked for!
+				return 0;
+			}
+
+        }
+    }
+    
+    //---END CL ARGS ---//
     GLFWwindow* window = vulkanWindow.init("RenderGU_Windows", 800, 600);
 
     try

@@ -25,6 +25,11 @@ int main(int argc, char** argv)
 				std::cout << "Long form for args not supported" << std::endl;
 				break;
 			}
+            if (*(NextArgStr + 1) == '\0')
+            {
+                std::cout << "Require a cl option after -. See -h for more info" << std::endl;
+                return 1;
+            }
 			// Okay, dealt with initial format, now matching chars
 			if (*(NextArgStr + 1) == 'h')
 			{

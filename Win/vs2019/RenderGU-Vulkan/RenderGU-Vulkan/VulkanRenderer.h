@@ -8,8 +8,30 @@
 #include "Utilities.h"
 #include <iostream>
 
+struct VulkanValidationDesiredMsgSeverity
+{
+	enum  MsgSeverity  
+	{
+		DIAG = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT,
+		INFO = VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT,
+		WARN = VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT,
+		ERROR = VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT
+	};
+
+	int State = 0;
+};
+
 struct VulkanRenderer
 {
+	VulkanRenderer()
+	{
+
+	}
+
+	VulkanRenderer(VulkanValidationDesiredMsgSeverity* _vulkanValidationDesiredMsgSeverityPtr)
+		:pVulkanValidationDesiredMsgSeverity(_vulkanValidationDesiredMsgSeverityPtr)
+	{
+	}
 	void createInstance();
 	int init(GLFWwindow* window);
 	void cleanup();
@@ -37,7 +59,7 @@ struct VulkanRenderer
 		const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
 		void* pUserData)
 	{
-		std::cerr << "Validation layer: " << pCallbackData->pMessage << std::endl;
+		std::cerr << "Custom callback : Validation layer: " << pCallbackData->pMessage << std::endl;
 
 		return VK_FALSE;
 		//return VK_TRUE;
@@ -50,9 +72,17 @@ struct VulkanRenderer
 		
 		VkDebugUtilsMessengerCreateInfoEXT createDebugMsgInfo = {};
 		createDebugMsgInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
-		createDebugMsgInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT
-			| VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT
-			| VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
+		
+		// Specify the types of severity to call the debug callback for
+		if (!this->pVulkanValidationDesiredMsgSeverity)
+		{
+			throw std::runtime_error("Our vulkan validation desired msg severity type ptr "
+				"is not expected to be null at this point - check renderer initialisation");
+		}
+
+		createDebugMsgInfo.messageSeverity =
+			this->pVulkanValidationDesiredMsgSeverity->State;
+
 		createDebugMsgInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT
 			| VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT
 			| VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
@@ -106,5 +136,6 @@ struct VulkanRenderer
 
 	bool validationLayerSupport();
 
+	VulkanValidationDesiredMsgSeverity* pVulkanValidationDesiredMsgSeverity = nullptr;
 };
 

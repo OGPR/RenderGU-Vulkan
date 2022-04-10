@@ -3,13 +3,16 @@
 #include "VulkanRenderer.h"
 #include <stdexcept>
 VulkanWindow vulkanWindow;
-VulkanRenderer vulkanRenderer;
+VulkanValidationDesiredMsgSeverity vulkanValidationDesiredMsgSeverity;
+
 int main(int argc, char** argv)
 {
     //---START CL ARGS ---//
     if (argc == 1)
     {
         // no extra args passed - Default behaviour
+        // Vulkan Spec states message severity must not be zero, so lets default to info
+        vulkanValidationDesiredMsgSeverity.State = vulkanValidationDesiredMsgSeverity.INFO;
     }
     else if (argc > 1)
     {
@@ -42,19 +45,27 @@ int main(int argc, char** argv)
             char* CurrArgStr  = NextArgStr + 1;
             while (*CurrArgStr != '\0')
             {
-                if (*CurrArgStr == 'a')
+                if (*CurrArgStr == 'd')
                 {
-                    std::cout << "option a" << std::endl;
+                    vulkanValidationDesiredMsgSeverity.State
+                        |= vulkanValidationDesiredMsgSeverity.DIAG;
 
                 }
-                if (*CurrArgStr == 'b')
+                if (*CurrArgStr == 'i')
                 {
-                    std::cout << "option b" << std::endl;
+                    vulkanValidationDesiredMsgSeverity.State
+                        |= vulkanValidationDesiredMsgSeverity.INFO;
 
                 }
-                if (*CurrArgStr == 'c')
+                if (*CurrArgStr == 'w')
                 {
-                    std::cout << "option c" << std::endl;
+                    vulkanValidationDesiredMsgSeverity.State
+                        |= vulkanValidationDesiredMsgSeverity.WARN;
+                }
+                if (*CurrArgStr == 'e')
+                {
+                    vulkanValidationDesiredMsgSeverity.State
+                        |= vulkanValidationDesiredMsgSeverity.ERROR;
                 }
 				++CurrArgStr;
             }
@@ -63,12 +74,12 @@ int main(int argc, char** argv)
         }
         // For Intial CL args testing (stop rest of program)
         // TODO remove when ready
-        return 0;
     }
     
     //---END CL ARGS ---//
     GLFWwindow* window = vulkanWindow.init("RenderGU_Windows", 800, 600);
 
+	VulkanRenderer vulkanRenderer(&vulkanValidationDesiredMsgSeverity);
     try
     {
 		vulkanRenderer.init(window);

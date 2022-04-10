@@ -11,8 +11,8 @@ int main(int argc, char** argv)
     if (argc == 1)
     {
         // no extra args passed - Default behaviour
-        // Vulkan Spec states message severity must not be zero, so lets default to info
-        vulkanValidationDesiredMsgSeverity.State = vulkanValidationDesiredMsgSeverity.INFO;
+        // Vulkan Spec states message severity must not be zero, so let's default to error only 
+        vulkanValidationDesiredMsgSeverity.State = vulkanValidationDesiredMsgSeverity.ERROR;
     }
     else if (argc > 1)
     {

@@ -38,7 +38,32 @@ int main(int argc, char** argv)
 				return 0;
 			}
 
+            //Work through argument string
+            char* CurrArgStr  = NextArgStr + 1;
+            while (*CurrArgStr != '\0')
+            {
+                if (*CurrArgStr == 'a')
+                {
+                    std::cout << "option a" << std::endl;
+
+                }
+                if (*CurrArgStr == 'b')
+                {
+                    std::cout << "option b" << std::endl;
+
+                }
+                if (*CurrArgStr == 'c')
+                {
+                    std::cout << "option c" << std::endl;
+                }
+				++CurrArgStr;
+            }
+
+
         }
+        // For Intial CL args testing (stop rest of program)
+        // TODO remove when ready
+        return 0;
     }
     
     //---END CL ARGS ---//

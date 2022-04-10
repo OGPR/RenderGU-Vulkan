@@ -36,7 +36,15 @@ int main(int argc, char** argv)
 			// Okay, dealt with initial format, now matching chars
 			if (*(NextArgStr + 1) == 'h')
 			{
-				std::cout << "Help requested!" << std::endl;
+				std::cout << "Usage: " << std::endl;
+                std::cout << " -<...>" << std::endl;
+                std::cout << "where <...> contains any of:" << std::endl;
+                std::cout << "d : Diagnostic message (corresponding to VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT" << std::endl;
+                std::cout << "i : Informational message (corresponding to VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT" << std::endl;
+                std::cout << "w : Warning message (corresponding to VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT" << std::endl;
+                std::cout << "e : Error message (corresponding to VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT" << std::endl;
+                std::cout << "" << std::endl;
+                std::cout << "Default behaviour is -e" << std::endl;
 				// We don't continue to run, help asked for!
 				return 0;
 			}

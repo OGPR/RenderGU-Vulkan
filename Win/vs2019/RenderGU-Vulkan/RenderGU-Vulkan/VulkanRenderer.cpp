@@ -6,6 +6,7 @@ int VulkanRenderer::init(GLFWwindow* window)
 	this->window = window;
 
 	createInstance();
+	setupDebugMessenger();
 	getPhysicalDevice();
 	createLogicalDevice();
 
@@ -14,6 +15,10 @@ int VulkanRenderer::init(GLFWwindow* window)
 
 void VulkanRenderer::cleanup()
 {
+	if (this->validationLayers)
+	{
+		destroyDebugMessenger();
+	}
 	vkDestroyDevice(mainDevice.logicalDevice, nullptr);
 	vkDestroyInstance(this->instance, nullptr);
 
@@ -161,6 +166,10 @@ void VulkanRenderer::createLogicalDevice()
 
 void VulkanRenderer::createInstance()
 {
+	if (validationLayer && !validationLayerSupport())
+		throw std::runtime_error("Validation layers requested,"
+			"but specified layer was not found");
+
 	// ---- Begin AppInfo ----
 	VkApplicationInfo appInfo = {};
 	appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
@@ -182,6 +191,11 @@ void VulkanRenderer::createInstance()
 		instanceExtensionList.push_back(glfwExtensionArray[i]);
 	}
 
+	if (this->validationLayers)
+	{
+		instanceExtensionList.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+	}
+
 	if (!checkInstanceExtensionSupport(&instanceExtensionList))
 	{
 		throw std::runtime_error("We don't have the required instance extensions!");
@@ -190,10 +204,24 @@ void VulkanRenderer::createInstance()
 	VkInstanceCreateInfo createInfo = {};
 	createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
 	createInfo.pApplicationInfo = &appInfo;
-	createInfo.enabledLayerCount = 0;
-	createInfo.ppEnabledLayerNames = nullptr;
+	createInfo.enabledLayerCount = this->validationLayers ? 1 : 0;
+	createInfo.ppEnabledLayerNames = this->validationLayers ?  &this->validationLayer : nullptr;
 	createInfo.enabledExtensionCount = static_cast<uint32_t>(instanceExtensionList.size());
 	createInfo.ppEnabledExtensionNames = instanceExtensionList.data();
+
+	VkDebugUtilsMessengerCreateInfoEXT createDebugMsgInfo = {};
+	createDebugMsgInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
+	createDebugMsgInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT
+		| VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT
+		| VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
+	createDebugMsgInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT
+		| VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT
+		| VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
+	createDebugMsgInfo.pfnUserCallback = debugCallback;
+	createDebugMsgInfo.pUserData = nullptr;
+
+	createInfo.pNext = this->validationLayers ?
+		(VkDebugUtilsMessengerCreateInfoEXT*)&createDebugMsgInfo : nullptr;
 	// ---- End CreateInfo ----
 
 	// ---- Begin CreateInstance ----
@@ -203,4 +231,25 @@ void VulkanRenderer::createInstance()
 	}
 
 	// ---- End CreateInstance ----
+}
+
+// Validation Layer code
+bool VulkanRenderer::validationLayerSupport()
+{
+	uint32_t numLayers = 0;
+	vkEnumerateInstanceLayerProperties(&numLayers, nullptr);
+
+	std::vector<VkLayerProperties> availableLayers(numLayers);
+	vkEnumerateInstanceLayerProperties(&numLayers, availableLayers.data());
+
+	// TODO - could continue to run, and just report that we won't be using v layers.
+	if (!availableLayers.size())
+		throw std::runtime_error("There are no avaliable validation layers"); 
+
+	for (const VkLayerProperties& layerProperties : availableLayers)
+	{
+		if (strcmp(this->validationLayer, layerProperties.layerName) == 0)
+			return true;
+	}
+	return false;
 }

@@ -52,6 +52,7 @@ struct VulkanRenderer
 
 	VkQueue graphicsQueue;
 	const char* validationLayer = "VK_LAYER_KHRONOS_validation";
+	VkSurfaceKHR surface = nullptr;
 
 	static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
 		VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
@@ -126,6 +127,7 @@ struct VulkanRenderer
 	void getPhysicalDevice();
 	void createLogicalDevice();
 	QueueFamilyIndices getQueueFamilies(VkPhysicalDevice device);
+	void createSurface();
 
 	// Validation Layers code
 	#ifdef NDEBUG

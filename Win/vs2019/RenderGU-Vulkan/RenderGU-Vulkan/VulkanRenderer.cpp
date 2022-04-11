@@ -7,6 +7,7 @@ int VulkanRenderer::init(GLFWwindow* window)
 
 	createInstance();
 	setupDebugMessenger();
+	createSurface();
 	getPhysicalDevice();
 	createLogicalDevice();
 
@@ -19,6 +20,7 @@ void VulkanRenderer::cleanup()
 	{
 		destroyDebugMessenger();
 	}
+	vkDestroySurfaceKHR(this->instance, this->surface, nullptr);
 	vkDestroyDevice(mainDevice.logicalDevice, nullptr);
 	vkDestroyInstance(this->instance, nullptr);
 
@@ -251,4 +253,13 @@ bool VulkanRenderer::validationLayerSupport()
 			return true;
 	}
 	return false;
+}
+
+void VulkanRenderer::createSurface()
+{
+	if (glfwCreateWindowSurface(this->instance, this->window, nullptr, &this->surface) != VK_SUCCESS)
+	{
+		throw std::runtime_error("Failed to create surface");
+	}
+
 }

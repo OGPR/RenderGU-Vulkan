@@ -79,28 +79,26 @@ bool VulkanRenderer::checkDeviceSuitable(VkPhysicalDevice device)
 
 QueueFamilyIndices VulkanRenderer::getQueueFamilies(VkPhysicalDevice device)
 {
-	QueueFamilyIndices indices;
+	QueueFamilyIndices queueFamilyIndices;
 
 	// TODO this pattern is familiar enough that it _might_ be worth abstracting(?)
-	uint32_t queueFamilyCount = 0;
-	vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, nullptr);
+	uint32_t numQueueFamilies =  0;
+	vkGetPhysicalDeviceQueueFamilyProperties(device, &numQueueFamilies, nullptr);
 
-	std::vector<VkQueueFamilyProperties> queueFamilyList(queueFamilyCount);
-	vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, queueFamilyList.data());
+	std::vector<VkQueueFamilyProperties> queueFamilies(numQueueFamilies);
+	vkGetPhysicalDeviceQueueFamilyProperties(device, &numQueueFamilies, queueFamilies.data());
 
-	// Go through each of queue family and check if at least one of type of require queue
-	int queueIndex  = 0;
-	for (const VkQueueFamilyProperties& queueFamily : queueFamilyList)
+	// Go through each queue family and check if at least one of type of required queue
+	for (uint32_t i = 0; i < numQueueFamilies; ++i)
 	{
-		++queueIndex;
-		if (queueFamily.queueCount > 0 && queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT)
+		if (queueFamilies[i].queueCount > 0 && queueFamilies[i].queueFlags & VK_QUEUE_GRAPHICS_BIT)
 		{
-			indices.graphicsFamily = queueIndex;
+			queueFamilyIndices.graphicsFamily = i;
 			break;
 		}
 	}
 
-	return indices;
+	return queueFamilyIndices;
 }
 
 void VulkanRenderer::getPhysicalDevice()

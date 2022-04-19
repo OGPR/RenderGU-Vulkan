@@ -126,7 +126,7 @@ struct VulkanRenderer
 
 	void getPhysicalDevice();
 	void createLogicalDevice();
-	QueueFamilyIndices getQueueFamilies(VkPhysicalDevice device);
+	QueueFamilyIndices getQueueFamilyIndices(VkPhysicalDevice device);
 	void createSurface();
 
 	// Validation Layers code

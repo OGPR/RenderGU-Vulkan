@@ -72,12 +72,12 @@ bool VulkanRenderer::checkDeviceSuitable(VkPhysicalDevice device)
 	// --- End placeholders --- 
 
 	// Queue Information
-	QueueFamilyIndices indices = getQueueFamilies(device);
+	QueueFamilyIndices indices = getQueueFamilyIndices(device);
 	
 	return indices.isValid();
 }
 
-QueueFamilyIndices VulkanRenderer::getQueueFamilies(VkPhysicalDevice device)
+QueueFamilyIndices VulkanRenderer::getQueueFamilyIndices(VkPhysicalDevice device)
 {
 	QueueFamilyIndices queueFamilyIndices;
 
@@ -128,7 +128,7 @@ void VulkanRenderer::getPhysicalDevice()
 void VulkanRenderer::createLogicalDevice()
 {
 	// Specify the queues the logical device needs to create
-	QueueFamilyIndices queueIndicies = getQueueFamilies(mainDevice.physicalDevice);
+	QueueFamilyIndices queueIndicies = getQueueFamilyIndices(mainDevice.physicalDevice);
 	if (!queueIndicies.isValid())
 		throw std::runtime_error("Queue index not valid!");
 

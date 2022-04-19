@@ -91,9 +91,14 @@ QueueFamilyIndices VulkanRenderer::getQueueFamilyIndices(VkPhysicalDevice device
 	// Go through each queue family and check if at least one of type of required queue
 	for (uint32_t i = 0; i < numQueueFamilies; ++i)
 	{
-		if (queueFamilies[i].queueCount > 0 && queueFamilies[i].queueFlags & VK_QUEUE_GRAPHICS_BIT)
+		if (queueFamilies[i].queueCount > 0
+			&& queueFamilies[i].queueFlags & VK_QUEUE_GRAPHICS_BIT)
 		{
 			queueFamilyIndices.graphicsFamily = i;
+		}
+
+		if (queueFamilyIndices.isValid())
+		{
 			break;
 		}
 	}

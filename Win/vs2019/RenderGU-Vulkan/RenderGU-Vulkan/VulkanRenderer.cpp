@@ -128,6 +128,9 @@ void VulkanRenderer::getPhysicalDevice()
 			break;
 		}
 	}
+
+	if (!mainDevice.physicalDevice)
+		throw std::runtime_error("No suitable physical device found");
 }
 
 void VulkanRenderer::createLogicalDevice()

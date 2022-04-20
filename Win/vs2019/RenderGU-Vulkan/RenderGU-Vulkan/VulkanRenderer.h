@@ -46,8 +46,8 @@ struct VulkanRenderer
 
 	struct
 	{
-		VkPhysicalDevice physicalDevice;
-		VkDevice logicalDevice;
+		VkPhysicalDevice physicalDevice = nullptr;
+		VkDevice logicalDevice = nullptr;
 	} mainDevice;
 
 	VkQueue graphicsQueue;

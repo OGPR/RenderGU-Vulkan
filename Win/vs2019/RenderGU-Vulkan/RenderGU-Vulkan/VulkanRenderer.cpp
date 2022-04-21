@@ -1,5 +1,6 @@
 #include "VulkanRenderer.h"
 #include <iostream>
+#include <set>
 
 int VulkanRenderer::init(GLFWwindow* window)
 {
@@ -147,20 +148,32 @@ void VulkanRenderer::createLogicalDevice()
 	if (!queueIndicies.isValid())
 		throw std::runtime_error("Queue index not valid!");
 
-	VkDeviceQueueCreateInfo queueCreateInfo = {};
-	queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-	queueCreateInfo.queueFamilyIndex = queueIndicies.graphicsFamily;
-	queueCreateInfo.queueCount = 1;
-	float priority = 1.0f;
-	queueCreateInfo.pQueuePriorities = &priority;
+	std::vector<VkDeviceQueueCreateInfo> queueCreateInfoList;
+	std::set<int> queueFamiliyIndexSet
+	{
+		queueIndicies.graphicsFamily,
+		queueIndicies.presentationFamily
+	};
+
+	for (int i : queueFamiliyIndexSet)
+	{
+		VkDeviceQueueCreateInfo queueCreateInfo = {};
+		queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+		queueCreateInfo.queueFamilyIndex = queueIndicies.graphicsFamily;
+		queueCreateInfo.queueCount = 1;
+		float priority = 1.0f;
+		queueCreateInfo.pQueuePriorities = &priority;
+
+		queueCreateInfoList.push_back(queueCreateInfo);
+	}
 
 	VkPhysicalDeviceFeatures physicalDeviceFeatures = {};
 
 
 	VkDeviceCreateInfo logicalDeviceCreateInfo = {};
 	logicalDeviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-	logicalDeviceCreateInfo.queueCreateInfoCount = 1;
-	logicalDeviceCreateInfo.pQueueCreateInfos = &queueCreateInfo;
+	logicalDeviceCreateInfo.queueCreateInfoCount = static_cast<uint32_t>(std::size(queueCreateInfoList));
+	logicalDeviceCreateInfo.pQueueCreateInfos = queueCreateInfoList.data();
 	logicalDeviceCreateInfo.enabledExtensionCount = 0; //device does not care about glfw (e.g), only instance does
 	logicalDeviceCreateInfo.ppEnabledExtensionNames = nullptr;
 	logicalDeviceCreateInfo.pEnabledFeatures = &physicalDeviceFeatures;
@@ -177,6 +190,7 @@ void VulkanRenderer::createLogicalDevice()
 	}
 
 	vkGetDeviceQueue(mainDevice.logicalDevice, queueIndicies.graphicsFamily, 0, &graphicsQueue);
+	vkGetDeviceQueue(mainDevice.logicalDevice, queueIndicies.graphicsFamily, 0, &presentationQueue);
 }
 
 void VulkanRenderer::createInstance()

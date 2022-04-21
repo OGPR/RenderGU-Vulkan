@@ -154,13 +154,27 @@ void VulkanRenderer::createLogicalDevice()
 	float priority = 1.0f;
 	queueCreateInfo.pQueuePriorities = &priority;
 
+	VkDeviceQueueCreateInfo queueCreateInfo2 = {};
+	queueCreateInfo2.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+	queueCreateInfo2.queueFamilyIndex = queueIndicies.presentationFamily;
+	queueCreateInfo2.queueCount = 1;
+	float priority2 = 1.0f;
+	queueCreateInfo2.pQueuePriorities = &priority2;
+
+	std::vector<VkDeviceQueueCreateInfo> DeviceCreateInfoArray
+	{
+		queueCreateInfo,
+		queueCreateInfo2
+	};
+
 	VkPhysicalDeviceFeatures physicalDeviceFeatures = {};
 
 
 	VkDeviceCreateInfo logicalDeviceCreateInfo = {};
 	logicalDeviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
 	logicalDeviceCreateInfo.queueCreateInfoCount = 1;
-	logicalDeviceCreateInfo.pQueueCreateInfos = &queueCreateInfo;
+	//logicalDeviceCreateInfo.pQueueCreateInfos = &queueCreateInfo;
+	logicalDeviceCreateInfo.pQueueCreateInfos = DeviceCreateInfoArray.data();
 	logicalDeviceCreateInfo.enabledExtensionCount = 0; //device does not care about glfw (e.g), only instance does
 	logicalDeviceCreateInfo.ppEnabledExtensionNames = nullptr;
 	logicalDeviceCreateInfo.pEnabledFeatures = &physicalDeviceFeatures;
@@ -177,6 +191,7 @@ void VulkanRenderer::createLogicalDevice()
 	}
 
 	vkGetDeviceQueue(mainDevice.logicalDevice, queueIndicies.graphicsFamily, 0, &graphicsQueue);
+	vkGetDeviceQueue(mainDevice.logicalDevice, queueIndicies.presentationFamily, 0, &this->presentationQueue);
 }
 
 void VulkanRenderer::createInstance()

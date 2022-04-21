@@ -51,6 +51,7 @@ struct VulkanRenderer
 	} mainDevice;
 
 	VkQueue graphicsQueue;
+	VkQueue presentationQueue;
 	const char* validationLayer = "VK_LAYER_KHRONOS_validation";
 	VkSurfaceKHR surface = nullptr;
 

@@ -97,6 +97,13 @@ QueueFamilyIndices VulkanRenderer::getQueueFamilyIndices(VkPhysicalDevice device
 			queueFamilyIndices.graphicsFamily = i;
 		}
 
+		VkBool32 presentationSupport = false;
+		vkGetPhysicalDeviceSurfaceSupportKHR(device, i, this->surface, &presentationSupport);
+		if (queueFamilies[i].queueCount > 0 && presentationSupport)
+		{
+			queueFamilyIndices.presentationFamily = i;
+		}
+
 		if (queueFamilyIndices.isValid())
 		{
 			break;

@@ -1,4 +1,10 @@
 #pragma once
+#include <vector>
+
+const std::vector<const char*> desiredPhyiscalDeviceExtenstions =
+{
+	VK_KHR_SWAPCHAIN_EXTENSION_NAME
+};
 
 // Indices (locations) of Queue Families
 struct QueueFamilyIndices

@@ -36,6 +36,9 @@ struct VulkanRenderer
 	int init(GLFWwindow* window);
 	void cleanup();
 	bool checkInstanceExtensionSupport(std::vector<const char*>* checkExtensions);
+	bool checkPhysicalDeviceExtensionSupport(
+		VkPhysicalDevice device,
+		const std::vector<const char*>& desiredPhysicalDeviceExtensions);
 	bool checkDeviceSuitable(VkPhysicalDevice device);
 	
 

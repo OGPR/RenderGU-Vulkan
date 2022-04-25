@@ -1,6 +1,7 @@
 #include "VulkanRenderer.h"
 #include <iostream>
 #include <set>
+#include <assert.h>
 
 int VulkanRenderer::init(GLFWwindow* window)
 {
@@ -60,8 +61,42 @@ bool VulkanRenderer::checkInstanceExtensionSupport(std::vector<const char*>* che
 	// --- End if given extensions are in list of available ones --- 
 }
 
+bool VulkanRenderer::checkPhysicalDeviceExtensionSupport(
+	VkPhysicalDevice device,
+	const std::vector<const char*>& desiredPhysicalDeviceExtensions)
+{
+	uint32_t physicalDeviceExtensionCount = 0;
+	vkEnumerateDeviceExtensionProperties(device, nullptr, &physicalDeviceExtensionCount, nullptr);
+
+	if (!physicalDeviceExtensionCount)
+		return false;
+
+	std::vector<VkExtensionProperties> physicalDeviceExtensionList(physicalDeviceExtensionCount);
+	vkEnumerateDeviceExtensionProperties(device, nullptr, &physicalDeviceExtensionCount, physicalDeviceExtensionList.data());
+
+	for (const char* desiredPhysicalDeviceExtension : desiredPhyiscalDeviceExtenstions)
+	{
+		bool desiredPhysicalDeviceExtensionFound = false;
+		for (const VkExtensionProperties& physicalDeviceExtension : physicalDeviceExtensionList)
+		{
+			if (strcmp(physicalDeviceExtension.extensionName, desiredPhysicalDeviceExtension) == 0)
+			{
+				desiredPhysicalDeviceExtensionFound = true;
+				break;
+			}
+		}
+
+		if (!desiredPhysicalDeviceExtensionFound)
+			return false;
+
+	}
+
+	return true;
+}
+
 bool VulkanRenderer::checkDeviceSuitable(VkPhysicalDevice device)
 {
+
 	// --- Placeholders for now ---
 	// Information about the device
 	VkPhysicalDeviceProperties deviceProperties;
@@ -75,7 +110,12 @@ bool VulkanRenderer::checkDeviceSuitable(VkPhysicalDevice device)
 	// Queue Information
 	QueueFamilyIndices indices = getQueueFamilyIndices(device);
 	
-	return indices.isValid();
+	bool desiredPhysicalDeviceExtensionsSupported =
+		checkPhysicalDeviceExtensionSupport(
+			device,
+			desiredPhyiscalDeviceExtenstions
+		);
+	return desiredPhysicalDeviceExtensionsSupported && indices.isValid();
 }
 
 QueueFamilyIndices VulkanRenderer::getQueueFamilyIndices(VkPhysicalDevice device)
@@ -174,8 +214,8 @@ void VulkanRenderer::createLogicalDevice()
 	logicalDeviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
 	logicalDeviceCreateInfo.queueCreateInfoCount = static_cast<uint32_t>(std::size(queueCreateInfoList));
 	logicalDeviceCreateInfo.pQueueCreateInfos = queueCreateInfoList.data();
-	logicalDeviceCreateInfo.enabledExtensionCount = 0; //device does not care about glfw (e.g), only instance does
-	logicalDeviceCreateInfo.ppEnabledExtensionNames = nullptr;
+	logicalDeviceCreateInfo.enabledExtensionCount = static_cast<uint32_t>(std::size(desiredPhyiscalDeviceExtenstions));
+	logicalDeviceCreateInfo.ppEnabledExtensionNames = desiredPhyiscalDeviceExtenstions.data();
 	logicalDeviceCreateInfo.pEnabledFeatures = &physicalDeviceFeatures;
 
 	VkResult result = vkCreateDevice(

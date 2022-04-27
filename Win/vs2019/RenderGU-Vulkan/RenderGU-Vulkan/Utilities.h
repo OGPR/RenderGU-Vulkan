@@ -18,3 +18,15 @@ struct QueueFamilyIndices
 	}
 };
 
+struct SwapChainDesc
+{
+	VkSurfaceCapabilitiesKHR surfaceCapabilities;
+	std::vector<VkSurfaceFormatKHR> surfaceFormatArray;
+	std::vector<VkPresentModeKHR> presentationModeArray;
+
+	bool isValid()
+	{
+		return std::size(surfaceFormatArray) && std::size(presentationModeArray);
+	}
+};
+

@@ -13,6 +13,7 @@ int VulkanRenderer::init(GLFWwindow* window)
 	getPhysicalDevice();
 	createLogicalDevice();
 
+
 	return 0;
 }
 
@@ -115,7 +116,10 @@ bool VulkanRenderer::checkDeviceSuitable(VkPhysicalDevice device)
 			device,
 			desiredPhyiscalDeviceExtenstions
 		);
-	return desiredPhysicalDeviceExtensionsSupported && indices.isValid();
+
+	bool swapChainDescValid = CreateSwapChainDesc(device).isValid();
+
+	return swapChainDescValid && desiredPhysicalDeviceExtensionsSupported && indices.isValid();
 }
 
 QueueFamilyIndices VulkanRenderer::getQueueFamilyIndices(VkPhysicalDevice device)
@@ -328,5 +332,35 @@ void VulkanRenderer::createSurface()
 	{
 		throw std::runtime_error("Failed to create surface");
 	}
+
+}
+
+SwapChainDesc VulkanRenderer::CreateSwapChainDesc(VkPhysicalDevice physicalDevice)
+{
+	SwapChainDesc swapChainDesc = {};
+
+	// Surface Capabilities
+	assert(this->surface);
+	vkGetPhysicalDeviceSurfaceCapabilitiesKHR(physicalDevice, this->surface, &swapChainDesc.surfaceCapabilities);
+
+	// Surface Formats
+	assert(this->surface);
+	uint32_t surfaceFormatCount = 0;
+	vkGetPhysicalDeviceSurfaceFormatsKHR(physicalDevice, this->surface, &surfaceFormatCount, nullptr);
+
+	assert(surfaceFormatCount);
+	swapChainDesc.surfaceFormatArray.resize(surfaceFormatCount);
+	vkGetPhysicalDeviceSurfaceFormatsKHR(physicalDevice, this->surface, &surfaceFormatCount, swapChainDesc.surfaceFormatArray.data());
+
+	// Presentation modes
+	assert(this->surface);
+	uint32_t presentModeCount = 0;
+	vkGetPhysicalDeviceSurfacePresentModesKHR(physicalDevice, this->surface, &presentModeCount, nullptr);
+
+	assert(presentModeCount);
+	swapChainDesc.presentationModeArray.resize(presentModeCount);
+	vkGetPhysicalDeviceSurfacePresentModesKHR(physicalDevice, this->surface, &presentModeCount, swapChainDesc.presentationModeArray.data());
+
+	return swapChainDesc;
 
 }

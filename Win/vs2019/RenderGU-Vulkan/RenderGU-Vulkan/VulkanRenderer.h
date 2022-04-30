@@ -71,6 +71,8 @@ struct VulkanRenderer
 	const char* validationLayer = "VK_LAYER_KHRONOS_validation";
 	VkSurfaceKHR surface = nullptr;
 	VkSwapchainKHR swapchain;
+	std::vector<VkImageView> ImageViewArray;
+	uint32_t SwapChainImageCount = 0;
 
 	static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
 		VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
@@ -148,6 +150,7 @@ struct VulkanRenderer
 	SwapChainDesc CreateSwapChainDesc(VkPhysicalDevice);
 	void createSurface();
 	void createSwapChain();
+	void createImageViews();
 
 	// Validation Layers code
 	#ifdef NDEBUG

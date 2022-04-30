@@ -13,6 +13,7 @@ int VulkanRenderer::init(GLFWwindow* window)
 	getPhysicalDevice();
 	createLogicalDevice();
 	createSwapChain();
+	createImageViews();
 
 
 	return 0;
@@ -26,6 +27,11 @@ void VulkanRenderer::cleanup()
 	}
 	vkDestroySwapchainKHR(this->mainDevice.logicalDevice, this->swapchain, nullptr);
 	vkDestroySurfaceKHR(this->instance, this->surface, nullptr);
+
+	uint32_t count = 0;
+	while (count < this->SwapChainImageCount)
+		vkDestroyImageView(mainDevice.logicalDevice, ImageViewArray[count++], nullptr);
+
 	vkDestroyDevice(mainDevice.logicalDevice, nullptr);
 	vkDestroyInstance(this->instance, nullptr);
 
@@ -441,6 +447,7 @@ void VulkanRenderer::createSwapChain()
 	swapChainCreateInfo.imageColorSpace = DesiredSurfaceFormat::ColorSpace;
 	swapChainCreateInfo.clipped = VK_FALSE; // Yes,  false - I want images to own all their pixels
 	swapChainCreateInfo.oldSwapchain = VK_NULL_HANDLE;
+	swapChainCreateInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 	VkResult vkRes = vkCreateSwapchainKHR(this->mainDevice.logicalDevice,
 		&swapChainCreateInfo,
 		nullptr,
@@ -450,4 +457,62 @@ void VulkanRenderer::createSwapChain()
 	assert(&this->swapchain);
 
 	
+}
+
+void VulkanRenderer::createImageViews()
+{
+	assert(this->swapchain);
+	uint32_t swapChainImageCount = 0;
+	vkGetSwapchainImagesKHR(mainDevice.logicalDevice,
+		swapchain,
+		&swapChainImageCount,
+		nullptr);
+
+	assert(swapChainImageCount);
+	std::vector<VkImage> swapChainImageArray(swapChainImageCount);
+	this->SwapChainImageCount = swapChainImageCount;
+	vkGetSwapchainImagesKHR(mainDevice.logicalDevice,
+		swapchain,
+		&swapChainImageCount,
+		swapChainImageArray.data());
+
+	assert(swapChainImageArray.size());
+	ImageViewArray.resize(swapChainImageCount);
+
+	for (int i = 0; i < swapChainImageArray.size(); ++i)
+	{
+		VkImageViewCreateInfo ImageViewCreateInfo = {};
+		ImageViewCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+		ImageViewCreateInfo.image = swapChainImageArray[i];
+		ImageViewCreateInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+		ImageViewCreateInfo.format = DesiredSurfaceFormat::Format;
+		ImageViewCreateInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
+		ImageViewCreateInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
+		ImageViewCreateInfo.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
+		ImageViewCreateInfo.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
+		ImageViewCreateInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+		ImageViewCreateInfo.subresourceRange.baseMipLevel = 0;
+		ImageViewCreateInfo.subresourceRange.levelCount = 1;
+		ImageViewCreateInfo.subresourceRange.baseArrayLayer = 0;
+		ImageViewCreateInfo.subresourceRange.layerCount = 1;
+		
+
+		VkResult vkRes = vkCreateImageView(
+			mainDevice.logicalDevice,
+			&ImageViewCreateInfo,
+			nullptr,
+			&ImageViewArray[i]
+		);
+
+		assert(ImageViewArray[i]);
+	}
+
+
+
+
+
+
+
+
+
 }

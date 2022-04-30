@@ -418,7 +418,18 @@ void VulkanRenderer::createSwapChain()
 	// This is where we create the swapchain
 	assert(this->mainDevice.logicalDevice);
 
+	// We are going to assume this. We can then make the image sharing mode in the
+	// swapchaincreateinfo exclusive.
+	// TODO this check and call - perhaps we could store the retrieved queue
+	// family indices at our renderer class scope
+	// TODO handle the case where the indices are different (use concurrent mode)
+	assert(getQueueFamilyIndices(mainDevice.physicalDevice).graphicsFamily ==
+		getQueueFamilyIndices(mainDevice.physicalDevice).presentationFamily);
+
 	VkSwapchainCreateInfoKHR swapChainCreateInfo = {};
+	swapChainCreateInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
+	swapChainCreateInfo.queueFamilyIndexCount = 0;
+	swapChainCreateInfo.pQueueFamilyIndices = nullptr;
 	swapChainCreateInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
 	swapChainCreateInfo.surface = this->surface;
 	swapChainCreateInfo.preTransform = swapChainDesc.surfaceCapabilities.currentTransform;
@@ -428,6 +439,8 @@ void VulkanRenderer::createSwapChain()
 	swapChainCreateInfo.minImageCount = swapChainDesc.surfaceCapabilities.minImageCount;
 	swapChainCreateInfo.imageFormat = DesiredSurfaceFormat::Format;
 	swapChainCreateInfo.imageColorSpace = DesiredSurfaceFormat::ColorSpace;
+	swapChainCreateInfo.clipped = VK_FALSE; // Yes,  false - I want images to own all their pixels
+	swapChainCreateInfo.oldSwapchain = VK_NULL_HANDLE;
 	VkResult vkRes = vkCreateSwapchainKHR(this->mainDevice.logicalDevice,
 		&swapChainCreateInfo,
 		nullptr,

@@ -12,6 +12,7 @@ int VulkanRenderer::init(GLFWwindow* window)
 	createSurface();
 	getPhysicalDevice();
 	createLogicalDevice();
+	createSwapChain();
 
 
 	return 0;
@@ -363,4 +364,67 @@ SwapChainDesc VulkanRenderer::CreateSwapChainDesc(VkPhysicalDevice physicalDevic
 
 	return swapChainDesc;
 
+}
+
+void VulkanRenderer::createSwapChain()
+{
+	SwapChainDesc swapChainDesc = CreateSwapChainDesc(mainDevice.physicalDevice);
+
+	// Check if our desired surface format is available in SwapChainDesc
+	assert(swapChainDesc.surfaceFormatArray.size());
+	bool foundDesiredSurfaceFormat = false;
+	bool foundDesiredSurface = false;
+	for (VkSurfaceFormatKHR surfaceFormat : swapChainDesc.surfaceFormatArray)
+	{
+		if (surfaceFormat.format == VK_FORMAT_UNDEFINED)
+			throw std::runtime_error("Surface format undefined!");
+			// TODO check with spec - if undefined it might mean all formats are available
+
+		if (surfaceFormat.format == DesiredSurfaceFormat::Format &&
+			surfaceFormat.colorSpace == DesiredSurfaceFormat::ColorSpace)
+		{
+			foundDesiredSurfaceFormat = true;
+			break;
+		}
+	}
+
+	if (!foundDesiredSurfaceFormat)
+		throw std::runtime_error("Cannot find our desired surface format from the swap chain desc");
+
+	
+
+	// Check if our desired present mode is available in SwapChainDesc
+	assert(swapChainDesc.presentationModeArray.size());
+	bool foundDesiredPresentMode = false;
+	for (VkPresentModeKHR presentMode : swapChainDesc.presentationModeArray)
+	{
+		if (presentMode == DesiredPresentation::Mode)
+		{
+			foundDesiredPresentMode = true;
+			break;
+		}
+	}
+	
+	if(!foundDesiredPresentMode)
+		throw std::runtime_error("Cannot find our desired present mode from the swap chain desc");
+		//TODO check with spec - we should be able to get FIFO
+
+	// Swap chain image resolution
+	if (swapChainDesc.surfaceCapabilities.currentExtent.width == UINT_FAST32_MAX)
+		throw std::runtime_error("Extent is changing");
+	//TODO handle this. Also use platform independent UINT max
+
+	// This is where we create the swapchain
+	assert(this->mainDevice.logicalDevice);
+
+	VkSwapchainCreateInfoKHR swapChainCreateInfo = {};
+	VkResult vkRes = vkCreateSwapchainKHR(this->mainDevice.logicalDevice,
+		&swapChainCreateInfo,
+		nullptr,
+		&this->swapchain
+	);
+
+	assert(&this->swapchain);
+
+	
 }

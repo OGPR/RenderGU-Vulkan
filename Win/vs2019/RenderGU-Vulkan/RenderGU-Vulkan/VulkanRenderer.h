@@ -21,6 +21,19 @@ struct VulkanValidationDesiredMsgSeverity
 	int State = 0;
 };
 
+struct DesiredSurfaceFormat
+{
+	// What our renderer will use
+	static const  VkFormat Format = VK_FORMAT_B8G8R8A8_UNORM;
+	static const VkColorSpaceKHR ColorSpace = VK_COLORSPACE_SRGB_NONLINEAR_KHR;
+};
+
+struct DesiredPresentation
+{
+	// What our renderer will use
+	static const VkPresentModeKHR Mode = VK_PRESENT_MODE_MAILBOX_KHR;
+};
+
 struct VulkanRenderer
 {
 	VulkanRenderer()
@@ -57,6 +70,7 @@ struct VulkanRenderer
 	VkQueue presentationQueue;
 	const char* validationLayer = "VK_LAYER_KHRONOS_validation";
 	VkSurfaceKHR surface = nullptr;
+	VkSwapchainKHR swapchain;
 
 	static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
 		VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
@@ -133,6 +147,7 @@ struct VulkanRenderer
 	QueueFamilyIndices getQueueFamilyIndices(VkPhysicalDevice device);
 	SwapChainDesc CreateSwapChainDesc(VkPhysicalDevice);
 	void createSurface();
+	void createSwapChain();
 
 	// Validation Layers code
 	#ifdef NDEBUG

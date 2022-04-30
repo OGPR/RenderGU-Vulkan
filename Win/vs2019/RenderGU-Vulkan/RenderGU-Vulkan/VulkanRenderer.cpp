@@ -24,6 +24,7 @@ void VulkanRenderer::cleanup()
 	{
 		destroyDebugMessenger();
 	}
+	vkDestroySwapchainKHR(this->mainDevice.logicalDevice, this->swapchain, nullptr);
 	vkDestroySurfaceKHR(this->instance, this->surface, nullptr);
 	vkDestroyDevice(mainDevice.logicalDevice, nullptr);
 	vkDestroyInstance(this->instance, nullptr);
@@ -418,6 +419,15 @@ void VulkanRenderer::createSwapChain()
 	assert(this->mainDevice.logicalDevice);
 
 	VkSwapchainCreateInfoKHR swapChainCreateInfo = {};
+	swapChainCreateInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+	swapChainCreateInfo.surface = this->surface;
+	swapChainCreateInfo.preTransform = swapChainDesc.surfaceCapabilities.currentTransform;
+	swapChainCreateInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+	swapChainCreateInfo.imageArrayLayers = 1;
+	swapChainCreateInfo.imageExtent = swapChainDesc.surfaceCapabilities.currentExtent;
+	swapChainCreateInfo.minImageCount = swapChainDesc.surfaceCapabilities.minImageCount;
+	swapChainCreateInfo.imageFormat = DesiredSurfaceFormat::Format;
+	swapChainCreateInfo.imageColorSpace = DesiredSurfaceFormat::ColorSpace;
 	VkResult vkRes = vkCreateSwapchainKHR(this->mainDevice.logicalDevice,
 		&swapChainCreateInfo,
 		nullptr,

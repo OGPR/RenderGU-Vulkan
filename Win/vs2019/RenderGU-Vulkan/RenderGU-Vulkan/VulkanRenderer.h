@@ -21,6 +21,19 @@ struct VulkanValidationDesiredMsgSeverity
 	int State = 0;
 };
 
+struct DesiredSurfaceFormat
+{
+	// What our renderer will use
+	static const  VkFormat Format = VK_FORMAT_B8G8R8A8_UNORM;
+	static const VkColorSpaceKHR ColorSpace = VK_COLORSPACE_SRGB_NONLINEAR_KHR;
+};
+
+struct DesiredPresentation
+{
+	// What our renderer will use
+	static const VkPresentModeKHR Mode = VK_PRESENT_MODE_MAILBOX_KHR;
+};
+
 struct VulkanRenderer
 {
 	VulkanRenderer()
@@ -36,6 +49,9 @@ struct VulkanRenderer
 	int init(GLFWwindow* window);
 	void cleanup();
 	bool checkInstanceExtensionSupport(std::vector<const char*>* checkExtensions);
+	bool checkPhysicalDeviceExtensionSupport(
+		VkPhysicalDevice device,
+		const std::vector<const char*>& desiredPhysicalDeviceExtensions);
 	bool checkDeviceSuitable(VkPhysicalDevice device);
 	
 
@@ -46,12 +62,17 @@ struct VulkanRenderer
 
 	struct
 	{
-		VkPhysicalDevice physicalDevice;
-		VkDevice logicalDevice;
+		VkPhysicalDevice physicalDevice = nullptr;
+		VkDevice logicalDevice = nullptr;
 	} mainDevice;
 
 	VkQueue graphicsQueue;
+	VkQueue presentationQueue;
 	const char* validationLayer = "VK_LAYER_KHRONOS_validation";
+	VkSurfaceKHR surface = nullptr;
+	VkSwapchainKHR swapchain;
+	std::vector<VkImageView> ImageViewArray;
+	uint32_t SwapChainImageCount = 0;
 
 	static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
 		VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
@@ -125,7 +146,11 @@ struct VulkanRenderer
 
 	void getPhysicalDevice();
 	void createLogicalDevice();
-	QueueFamilyIndices getQueueFamilies(VkPhysicalDevice device);
+	QueueFamilyIndices getQueueFamilyIndices(VkPhysicalDevice device);
+	SwapChainDesc CreateSwapChainDesc(VkPhysicalDevice);
+	void createSurface();
+	void createSwapChain();
+	void createImageViews();
 
 	// Validation Layers code
 	#ifdef NDEBUG

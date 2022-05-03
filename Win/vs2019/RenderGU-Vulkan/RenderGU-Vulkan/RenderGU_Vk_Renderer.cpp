@@ -1,9 +1,9 @@
-#include "VulkanRenderer.h"
+#include "RenderGU_Vk_Renderer.h"
 #include <iostream>
 #include <set>
 #include <assert.h>
 
-int VulkanRenderer::init(GLFWwindow* window)
+int RenderGU_Vk_Renderer::init(GLFWwindow* window)
 {
 	this->window = window;
 
@@ -19,7 +19,7 @@ int VulkanRenderer::init(GLFWwindow* window)
 	return 0;
 }
 
-void VulkanRenderer::cleanup()
+void RenderGU_Vk_Renderer::cleanup()
 {
 	if (this->validationLayers)
 	{
@@ -37,7 +37,7 @@ void VulkanRenderer::cleanup()
 
 }
 
-bool VulkanRenderer::checkInstanceExtensionSupport(std::vector<const char*>* checkExtensions)
+bool RenderGU_Vk_Renderer::checkInstanceExtensionSupport(std::vector<const char*>* checkExtensions)
 {
 	// --- Begin get extension count ---
 	uint32_t extensionCount = 0;
@@ -70,7 +70,7 @@ bool VulkanRenderer::checkInstanceExtensionSupport(std::vector<const char*>* che
 	// --- End if given extensions are in list of available ones --- 
 }
 
-bool VulkanRenderer::checkPhysicalDeviceExtensionSupport(
+bool RenderGU_Vk_Renderer::checkPhysicalDeviceExtensionSupport(
 	VkPhysicalDevice device,
 	const std::vector<const char*>& desiredPhysicalDeviceExtensions)
 {
@@ -103,7 +103,7 @@ bool VulkanRenderer::checkPhysicalDeviceExtensionSupport(
 	return true;
 }
 
-bool VulkanRenderer::checkDeviceSuitable(VkPhysicalDevice device)
+bool RenderGU_Vk_Renderer::checkDeviceSuitable(VkPhysicalDevice device)
 {
 
 	// --- Placeholders for now ---
@@ -130,7 +130,7 @@ bool VulkanRenderer::checkDeviceSuitable(VkPhysicalDevice device)
 	return swapChainDescValid && desiredPhysicalDeviceExtensionsSupported && indices.isValid();
 }
 
-QueueFamilyIndices VulkanRenderer::getQueueFamilyIndices(VkPhysicalDevice device)
+QueueFamilyIndices RenderGU_Vk_Renderer::getQueueFamilyIndices(VkPhysicalDevice device)
 {
 	QueueFamilyIndices queueFamilyIndices;
 
@@ -166,7 +166,7 @@ QueueFamilyIndices VulkanRenderer::getQueueFamilyIndices(VkPhysicalDevice device
 	return queueFamilyIndices;
 }
 
-void VulkanRenderer::getPhysicalDevice()
+void RenderGU_Vk_Renderer::getPhysicalDevice()
 {
 	// Enumerate Physical Devices the vkInstance can access
 	uint32_t deviceCount = 0;
@@ -193,7 +193,7 @@ void VulkanRenderer::getPhysicalDevice()
 		throw std::runtime_error("No suitable physical device found");
 }
 
-void VulkanRenderer::createLogicalDevice()
+void RenderGU_Vk_Renderer::createLogicalDevice()
 {
 	// Specify the queues the logical device needs to create
 	QueueFamilyIndices queueIndicies = getQueueFamilyIndices(mainDevice.physicalDevice);
@@ -245,7 +245,7 @@ void VulkanRenderer::createLogicalDevice()
 	vkGetDeviceQueue(mainDevice.logicalDevice, queueIndicies.graphicsFamily, 0, &presentationQueue);
 }
 
-void VulkanRenderer::createInstance()
+void RenderGU_Vk_Renderer::createInstance()
 {
 	if (validationLayer && !validationLayerSupport())
 		throw std::runtime_error("Validation layers requested,"
@@ -314,7 +314,7 @@ void VulkanRenderer::createInstance()
 }
 
 // Validation Layer code
-bool VulkanRenderer::validationLayerSupport()
+bool RenderGU_Vk_Renderer::validationLayerSupport()
 {
 	uint32_t numLayers = 0;
 	vkEnumerateInstanceLayerProperties(&numLayers, nullptr);
@@ -334,7 +334,7 @@ bool VulkanRenderer::validationLayerSupport()
 	return false;
 }
 
-void VulkanRenderer::createSurface()
+void RenderGU_Vk_Renderer::createSurface()
 {
 	if (glfwCreateWindowSurface(this->instance, this->window, nullptr, &this->surface) != VK_SUCCESS)
 	{
@@ -343,7 +343,7 @@ void VulkanRenderer::createSurface()
 
 }
 
-SwapChainDesc VulkanRenderer::CreateSwapChainDesc(VkPhysicalDevice physicalDevice)
+SwapChainDesc RenderGU_Vk_Renderer::CreateSwapChainDesc(VkPhysicalDevice physicalDevice)
 {
 	SwapChainDesc swapChainDesc = {};
 
@@ -373,7 +373,7 @@ SwapChainDesc VulkanRenderer::CreateSwapChainDesc(VkPhysicalDevice physicalDevic
 
 }
 
-void VulkanRenderer::createSwapChain()
+void RenderGU_Vk_Renderer::createSwapChain()
 {
 	SwapChainDesc swapChainDesc = CreateSwapChainDesc(mainDevice.physicalDevice);
 
@@ -459,7 +459,7 @@ void VulkanRenderer::createSwapChain()
 	
 }
 
-void VulkanRenderer::createImageViews()
+void RenderGU_Vk_Renderer::createImageViews()
 {
 	assert(this->swapchain);
 	uint32_t swapChainImageCount = 0;

@@ -34,14 +34,14 @@ struct DesiredPresentation
 	static const VkPresentModeKHR Mode = VK_PRESENT_MODE_MAILBOX_KHR;
 };
 
-struct VulkanRenderer
+struct RenderGU_Vk_Renderer
 {
-	VulkanRenderer()
+	RenderGU_Vk_Renderer()
 	{
 
 	}
 
-	VulkanRenderer(VulkanValidationDesiredMsgSeverity* _vulkanValidationDesiredMsgSeverityPtr)
+	RenderGU_Vk_Renderer(VulkanValidationDesiredMsgSeverity* _vulkanValidationDesiredMsgSeverityPtr)
 		:pVulkanValidationDesiredMsgSeverity(_vulkanValidationDesiredMsgSeverityPtr)
 	{
 	}

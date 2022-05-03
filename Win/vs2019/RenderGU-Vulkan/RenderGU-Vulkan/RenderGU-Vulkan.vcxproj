@@ -148,12 +148,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="VulkanRenderer.cpp" />
+    <ClCompile Include="RenderGU_Vk_Renderer.cpp" />
     <ClCompile Include="VulkanWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Utilities.h" />
-    <ClInclude Include="VulkanRenderer.h" />
+    <ClInclude Include="RenderGU_Vk_Renderer.h" />
     <ClInclude Include="VulkanWindow.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -1,6 +1,6 @@
 #include <iostream>
 #include "VulkanWindow.h"
-#include "VulkanRenderer.h"
+#include "RenderGU_Vk_Renderer.h"
 #include <stdexcept>
 VulkanWindow vulkanWindow;
 
@@ -92,10 +92,10 @@ int main(int argc, char** argv)
 
     GLFWwindow* window = vulkanWindow.init("RenderGU_Windows", 800, 600);
 
-	VulkanRenderer vulkanRenderer(&vulkanValidationDesiredMsgSeverity);
+	RenderGU_Vk_Renderer _RenderGU_Vk_Renderer(&vulkanValidationDesiredMsgSeverity);
     try
     {
-		vulkanRenderer.init(window);
+		_RenderGU_Vk_Renderer.init(window);
     }
     catch (const std::exception& e)
     {
@@ -116,7 +116,7 @@ int main(int argc, char** argv)
         glfwPollEvents();
     }
 
-    vulkanRenderer.cleanup();
+    _RenderGU_Vk_Renderer.cleanup();
 
     glfwDestroyWindow(window);
 

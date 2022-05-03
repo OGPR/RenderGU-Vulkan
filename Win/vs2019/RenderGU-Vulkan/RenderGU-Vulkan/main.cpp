@@ -3,9 +3,10 @@
 #include "VulkanRenderer.h"
 #include <stdexcept>
 VulkanWindow vulkanWindow;
-VulkanValidationDesiredMsgSeverity vulkanValidationDesiredMsgSeverity;
 
-bool clArgsRead(int argc, char** argv)
+bool clArgsRead(int argc,
+                char** argv,
+                VulkanValidationDesiredMsgSeverity& vulkanValidationDesiredMsgSeverity)
 {
     if (argc == 1)
     {
@@ -85,7 +86,8 @@ bool clArgsRead(int argc, char** argv)
 
 int main(int argc, char** argv)
 {
-    if (!clArgsRead(argc, argv))
+	VulkanValidationDesiredMsgSeverity vulkanValidationDesiredMsgSeverity;
+    if (!clArgsRead(argc, argv, vulkanValidationDesiredMsgSeverity))
         return 1;
 
     GLFWwindow* window = vulkanWindow.init("RenderGU_Windows", 800, 600);

@@ -14,6 +14,7 @@ int RenderGU_Vk_Renderer::Init(GLFWwindow* window)
 	CreateLogicalDevice();
 	CreateSwapchain();
 	CreateImageViews();
+	CreateGraphicsPipeline();
 
 
 	return 0;
@@ -573,4 +574,9 @@ void RenderGU_Vk_Renderer::CreateImageViews()
 		assert(ImageViewArray[i]);
 	}
 
+}
+
+void RenderGU_Vk_Renderer::CreateGraphicsPipeline()
+{
+	throw std::runtime_error(std::string(__FUNCSIG__) + " not implemented");
 }

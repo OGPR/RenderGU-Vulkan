@@ -53,6 +53,7 @@ struct RenderGU_Vk_Renderer
 	void CreateLogicalDevice();
 	void CreateSwapchain();
 	void CreateImageViews();
+	void CreateGraphicsPipeline();
 
 	void DestroyDebugMessenger();
 	void Cleanup();

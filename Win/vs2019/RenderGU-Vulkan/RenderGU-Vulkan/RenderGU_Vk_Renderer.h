@@ -45,8 +45,8 @@ struct RenderGU_Vk_Renderer
 		:pVulkanValidationDesiredMsgSeverity(_vulkanValidationDesiredMsgSeverityPtr)
 	{
 	}
-	void createInstance();
 	int init(GLFWwindow* window);
+	void createInstance();
 	void cleanup();
 	bool checkInstanceExtensionSupport(std::vector<const char*>* checkExtensions);
 	bool checkPhysicalDeviceExtensionSupport(
@@ -78,71 +78,11 @@ struct RenderGU_Vk_Renderer
 		VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
 		VkDebugUtilsMessageTypeFlagsEXT messageType,
 		const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
-		void* pUserData)
-	{
-		std::cerr << "Custom callback : Validation layer: " << pCallbackData->pMessage << std::endl;
+		void* pUserData);
 
-		return VK_FALSE;
-		//return VK_TRUE;
-	}
-
-	void setupDebugMessenger()
-	{
-		if (!this->validationLayers)
-			return;
-		
-		VkDebugUtilsMessengerCreateInfoEXT createDebugMsgInfo = {};
-		createDebugMsgInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
-		
-		// Specify the types of severity to call the debug callback for
-		if (!this->pVulkanValidationDesiredMsgSeverity)
-		{
-			throw std::runtime_error("Our vulkan validation desired msg severity type ptr "
-				"is not expected to be null at this point - check renderer initialisation");
-		}
-
-		createDebugMsgInfo.messageSeverity =
-			this->pVulkanValidationDesiredMsgSeverity->State;
-
-		createDebugMsgInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT
-			| VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT
-			| VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
-		createDebugMsgInfo.pfnUserCallback = debugCallback;
-		createDebugMsgInfo.pUserData = nullptr;
-
-		if (!this->instance)
-		{
-			throw std::runtime_error("Instance has yet to be created!");
-		}
-		auto func = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(
-			this->instance, "vkCreateDebugUtilsMessengerEXT");
-
-		if (!func)
-		{
-			throw std::runtime_error("vk extension not present");
-		}
-
-		func(this->instance, &createDebugMsgInfo, nullptr, &debugMessenger);
-
-	}
+	void setupDebugMessenger();
 	
-	void destroyDebugMessenger()
-	{
-		if (!this->instance)
-			throw std::runtime_error("No instance has been created!");
-		auto func = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(
-			this->instance, "vkDestroyDebugUtilsMessengerEXT");
-
-		if (!func)
-		{
-			throw std::runtime_error("vk extension not present");
-		}
-
-		func(this->instance, debugMessenger, nullptr);
-	}
-
-
-
+	void destroyDebugMessenger();
 
 	void getPhysicalDevice();
 	void createLogicalDevice();

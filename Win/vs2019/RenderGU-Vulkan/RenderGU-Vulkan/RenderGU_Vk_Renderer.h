@@ -45,23 +45,23 @@ struct RenderGU_Vk_Renderer
 		:pVulkanValidationDesiredMsgSeverity(_vulkanValidationDesiredMsgSeverityPtr)
 	{
 	}
-	int init(GLFWwindow* window);
-	void createInstance();
-	void setupDebugMessenger();
-	void createSurface();
-	void getPhysicalDevice();
-	void createLogicalDevice();
-	void createSwapChain();
-	void createImageViews();
+	int Init(GLFWwindow*);
+	void CreateInstance();
+	void SetupDebugMessenger();
+	void CreateSurface();
+	void GetPhysicalDevice();
+	void CreateLogicalDevice();
+	void CreateSwapChain();
+	void CreateImageViews();
 
-	void destroyDebugMessenger();
-	void cleanup();
-	bool checkInstanceExtensionSupport(std::vector<const char*>* checkExtensions);
-	bool checkPhysicalDeviceExtensionSupport(VkPhysicalDevice device, const std::vector<const char*>& desiredPhysicalDeviceExtensions);
-	bool checkDeviceSuitable(VkPhysicalDevice device);
-	bool validationLayerSupport();
+	void DestroyDebugMessenger();
+	void Cleanup();
+	bool CheckInstanceExtensionSupport(std::vector<const char*>*);
+	bool CheckPhysicalDeviceExtensionSupport(VkPhysicalDevice, const std::vector<const char*>&);
+	bool CheckDeviceSuitable(VkPhysicalDevice);
+	bool ValidationLayerSupport();
 	
-	QueueFamilyIndices getQueueFamilyIndices(VkPhysicalDevice device);
+	QueueFamilyIndices GetQueueFamilyIndices(VkPhysicalDevice);
 	SwapChainDesc CreateSwapChainDesc(VkPhysicalDevice);
 
 	// Validation Layers code
@@ -71,11 +71,11 @@ struct RenderGU_Vk_Renderer
 		const bool validationLayers = true;
 	#endif
 
-	static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
-		VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
-		VkDebugUtilsMessageTypeFlagsEXT messageType,
-		const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
-		void* pUserData);
+	static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(
+		VkDebugUtilsMessageSeverityFlagBitsEXT,
+		VkDebugUtilsMessageTypeFlagsEXT,
+		const VkDebugUtilsMessengerCallbackDataEXT*,
+		void*);
 
 
 	GLFWwindow* window;

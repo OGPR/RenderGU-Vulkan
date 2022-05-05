@@ -3,23 +3,23 @@
 #include <set>
 #include <assert.h>
 
-int RenderGU_Vk_Renderer::init(GLFWwindow* window)
+int RenderGU_Vk_Renderer::Init(GLFWwindow* window)
 {
 	this->window = window;
 
-	createInstance();
-	setupDebugMessenger();
-	createSurface();
-	getPhysicalDevice();
-	createLogicalDevice();
-	createSwapChain();
-	createImageViews();
+	CreateInstance();
+	SetupDebugMessenger();
+	CreateSurface();
+	GetPhysicalDevice();
+	CreateLogicalDevice();
+	CreateSwapChain();
+	CreateImageViews();
 
 
 	return 0;
 }
 
-void RenderGU_Vk_Renderer::setupDebugMessenger()
+void RenderGU_Vk_Renderer::SetupDebugMessenger()
 {
 	if (!this->validationLayers)
 		return;
@@ -40,7 +40,7 @@ void RenderGU_Vk_Renderer::setupDebugMessenger()
 	createDebugMsgInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT
 		| VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT
 		| VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
-	createDebugMsgInfo.pfnUserCallback = debugCallback;
+	createDebugMsgInfo.pfnUserCallback = DebugCallback;
 	createDebugMsgInfo.pUserData = nullptr;
 
 	if (!this->instance)
@@ -59,7 +59,7 @@ void RenderGU_Vk_Renderer::setupDebugMessenger()
 
 }
 
-void RenderGU_Vk_Renderer::destroyDebugMessenger()
+void RenderGU_Vk_Renderer::DestroyDebugMessenger()
 {
 	if (!this->instance)
 		throw std::runtime_error("No instance has been created!");
@@ -74,7 +74,7 @@ void RenderGU_Vk_Renderer::destroyDebugMessenger()
 	func(this->instance, debugMessenger, nullptr);
 }
 
-VKAPI_ATTR VkBool32 VKAPI_CALL RenderGU_Vk_Renderer::debugCallback(
+VKAPI_ATTR VkBool32 VKAPI_CALL RenderGU_Vk_Renderer::DebugCallback(
 	VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
 	VkDebugUtilsMessageTypeFlagsEXT messageType,
 	const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
@@ -86,11 +86,11 @@ VKAPI_ATTR VkBool32 VKAPI_CALL RenderGU_Vk_Renderer::debugCallback(
 	//return VK_TRUE;
 }
 
-void RenderGU_Vk_Renderer::cleanup()
+void RenderGU_Vk_Renderer::Cleanup()
 {
 	if (this->validationLayers)
 	{
-		destroyDebugMessenger();
+		DestroyDebugMessenger();
 	}
 	vkDestroySwapchainKHR(this->mainDevice.logicalDevice, this->swapchain, nullptr);
 	vkDestroySurfaceKHR(this->instance, this->surface, nullptr);
@@ -104,7 +104,7 @@ void RenderGU_Vk_Renderer::cleanup()
 
 }
 
-bool RenderGU_Vk_Renderer::checkInstanceExtensionSupport(std::vector<const char*>* checkExtensions)
+bool RenderGU_Vk_Renderer::CheckInstanceExtensionSupport(std::vector<const char*>* checkExtensions)
 {
 	// --- Begin get extension count ---
 	uint32_t extensionCount = 0;
@@ -137,7 +137,7 @@ bool RenderGU_Vk_Renderer::checkInstanceExtensionSupport(std::vector<const char*
 	// --- End if given extensions are in list of available ones --- 
 }
 
-bool RenderGU_Vk_Renderer::checkPhysicalDeviceExtensionSupport(
+bool RenderGU_Vk_Renderer::CheckPhysicalDeviceExtensionSupport(
 	VkPhysicalDevice device,
 	const std::vector<const char*>& desiredPhysicalDeviceExtensions)
 {
@@ -170,7 +170,7 @@ bool RenderGU_Vk_Renderer::checkPhysicalDeviceExtensionSupport(
 	return true;
 }
 
-bool RenderGU_Vk_Renderer::checkDeviceSuitable(VkPhysicalDevice device)
+bool RenderGU_Vk_Renderer::CheckDeviceSuitable(VkPhysicalDevice device)
 {
 
 	// --- Placeholders for now ---
@@ -184,10 +184,10 @@ bool RenderGU_Vk_Renderer::checkDeviceSuitable(VkPhysicalDevice device)
 	// --- End placeholders --- 
 
 	// Queue Information
-	QueueFamilyIndices indices = getQueueFamilyIndices(device);
+	QueueFamilyIndices indices = GetQueueFamilyIndices(device);
 	
 	bool desiredPhysicalDeviceExtensionsSupported =
-		checkPhysicalDeviceExtensionSupport(
+		CheckPhysicalDeviceExtensionSupport(
 			device,
 			desiredPhyiscalDeviceExtenstions
 		);
@@ -197,7 +197,7 @@ bool RenderGU_Vk_Renderer::checkDeviceSuitable(VkPhysicalDevice device)
 	return swapChainDescValid && desiredPhysicalDeviceExtensionsSupported && indices.isValid();
 }
 
-QueueFamilyIndices RenderGU_Vk_Renderer::getQueueFamilyIndices(VkPhysicalDevice device)
+QueueFamilyIndices RenderGU_Vk_Renderer::GetQueueFamilyIndices(VkPhysicalDevice device)
 {
 	QueueFamilyIndices queueFamilyIndices;
 
@@ -233,7 +233,7 @@ QueueFamilyIndices RenderGU_Vk_Renderer::getQueueFamilyIndices(VkPhysicalDevice 
 	return queueFamilyIndices;
 }
 
-void RenderGU_Vk_Renderer::getPhysicalDevice()
+void RenderGU_Vk_Renderer::GetPhysicalDevice()
 {
 	// Enumerate Physical Devices the vkInstance can access
 	uint32_t deviceCount = 0;
@@ -249,7 +249,7 @@ void RenderGU_Vk_Renderer::getPhysicalDevice()
 	// Find valid device
 	for (const VkPhysicalDevice& physicalDevice : deviceList)
 	{
-		if (checkDeviceSuitable(physicalDevice))
+		if (CheckDeviceSuitable(physicalDevice))
 		{
 			mainDevice.physicalDevice = physicalDevice;
 			break;
@@ -260,10 +260,10 @@ void RenderGU_Vk_Renderer::getPhysicalDevice()
 		throw std::runtime_error("No suitable physical device found");
 }
 
-void RenderGU_Vk_Renderer::createLogicalDevice()
+void RenderGU_Vk_Renderer::CreateLogicalDevice()
 {
 	// Specify the queues the logical device needs to create
-	QueueFamilyIndices queueIndicies = getQueueFamilyIndices(mainDevice.physicalDevice);
+	QueueFamilyIndices queueIndicies = GetQueueFamilyIndices(mainDevice.physicalDevice);
 	if (!queueIndicies.isValid())
 		throw std::runtime_error("Queue index not valid!");
 
@@ -312,9 +312,9 @@ void RenderGU_Vk_Renderer::createLogicalDevice()
 	vkGetDeviceQueue(mainDevice.logicalDevice, queueIndicies.graphicsFamily, 0, &presentationQueue);
 }
 
-void RenderGU_Vk_Renderer::createInstance()
+void RenderGU_Vk_Renderer::CreateInstance()
 {
-	if (validationLayer && !validationLayerSupport())
+	if (validationLayer && !ValidationLayerSupport())
 		throw std::runtime_error("Validation layers requested,"
 			"but specified layer was not found");
 
@@ -344,7 +344,7 @@ void RenderGU_Vk_Renderer::createInstance()
 		instanceExtensionList.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
 	}
 
-	if (!checkInstanceExtensionSupport(&instanceExtensionList))
+	if (!CheckInstanceExtensionSupport(&instanceExtensionList))
 	{
 		throw std::runtime_error("We don't have the required instance extensions!");
 	}
@@ -363,7 +363,7 @@ void RenderGU_Vk_Renderer::createInstance()
 	createDebugMsgInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT
 		| VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT
 		| VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
-	createDebugMsgInfo.pfnUserCallback = debugCallback;
+	createDebugMsgInfo.pfnUserCallback = DebugCallback;
 	createDebugMsgInfo.pUserData = nullptr;
 
 	createInfo.pNext = this->validationLayers ?
@@ -381,7 +381,7 @@ void RenderGU_Vk_Renderer::createInstance()
 }
 
 // Validation Layer code
-bool RenderGU_Vk_Renderer::validationLayerSupport()
+bool RenderGU_Vk_Renderer::ValidationLayerSupport()
 {
 	uint32_t numLayers = 0;
 	vkEnumerateInstanceLayerProperties(&numLayers, nullptr);
@@ -401,7 +401,7 @@ bool RenderGU_Vk_Renderer::validationLayerSupport()
 	return false;
 }
 
-void RenderGU_Vk_Renderer::createSurface()
+void RenderGU_Vk_Renderer::CreateSurface()
 {
 	if (glfwCreateWindowSurface(this->instance, this->window, nullptr, &this->surface) != VK_SUCCESS)
 	{
@@ -440,7 +440,7 @@ SwapChainDesc RenderGU_Vk_Renderer::CreateSwapChainDesc(VkPhysicalDevice physica
 
 }
 
-void RenderGU_Vk_Renderer::createSwapChain()
+void RenderGU_Vk_Renderer::CreateSwapChain()
 {
 	SwapChainDesc swapChainDesc = CreateSwapChainDesc(mainDevice.physicalDevice);
 
@@ -496,8 +496,8 @@ void RenderGU_Vk_Renderer::createSwapChain()
 	// TODO this check and call - perhaps we could store the retrieved queue
 	// family indices at our renderer class scope
 	// TODO handle the case where the indices are different (use concurrent mode)
-	assert(getQueueFamilyIndices(mainDevice.physicalDevice).graphicsFamily ==
-		getQueueFamilyIndices(mainDevice.physicalDevice).presentationFamily);
+	assert(GetQueueFamilyIndices(mainDevice.physicalDevice).graphicsFamily ==
+		GetQueueFamilyIndices(mainDevice.physicalDevice).presentationFamily);
 
 	VkSwapchainCreateInfoKHR swapChainCreateInfo = {};
 	swapChainCreateInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
@@ -526,7 +526,7 @@ void RenderGU_Vk_Renderer::createSwapChain()
 	
 }
 
-void RenderGU_Vk_Renderer::createImageViews()
+void RenderGU_Vk_Renderer::CreateImageViews()
 {
 	assert(this->swapchain);
 	uint32_t swapChainImageCount = 0;
@@ -573,13 +573,5 @@ void RenderGU_Vk_Renderer::createImageViews()
 
 		assert(ImageViewArray[i]);
 	}
-
-
-
-
-
-
-
-
 
 }

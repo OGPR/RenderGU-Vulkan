@@ -95,7 +95,7 @@ int main(int argc, char** argv)
 	RenderGU_Vk_Renderer _RenderGU_Vk_Renderer(&vulkanValidationDesiredMsgSeverity);
     try
     {
-		_RenderGU_Vk_Renderer.init(window);
+		_RenderGU_Vk_Renderer.Init(window);
     }
     catch (const std::exception& e)
     {
@@ -116,7 +116,7 @@ int main(int argc, char** argv)
         glfwPollEvents();
     }
 
-    _RenderGU_Vk_Renderer.cleanup();
+    _RenderGU_Vk_Renderer.Cleanup();
 
     glfwDestroyWindow(window);
 

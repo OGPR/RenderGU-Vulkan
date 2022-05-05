@@ -47,13 +47,35 @@ struct RenderGU_Vk_Renderer
 	}
 	int init(GLFWwindow* window);
 	void createInstance();
+	void setupDebugMessenger();
+	void createSurface();
+	void getPhysicalDevice();
+	void createLogicalDevice();
+	void createSwapChain();
+	void createImageViews();
+
+	void destroyDebugMessenger();
 	void cleanup();
 	bool checkInstanceExtensionSupport(std::vector<const char*>* checkExtensions);
-	bool checkPhysicalDeviceExtensionSupport(
-		VkPhysicalDevice device,
-		const std::vector<const char*>& desiredPhysicalDeviceExtensions);
+	bool checkPhysicalDeviceExtensionSupport(VkPhysicalDevice device, const std::vector<const char*>& desiredPhysicalDeviceExtensions);
 	bool checkDeviceSuitable(VkPhysicalDevice device);
+	bool validationLayerSupport();
 	
+	QueueFamilyIndices getQueueFamilyIndices(VkPhysicalDevice device);
+	SwapChainDesc CreateSwapChainDesc(VkPhysicalDevice);
+
+	// Validation Layers code
+	#ifdef NDEBUG
+		const bool validationLayers = false;
+	#else
+		const bool validationLayers = true;
+	#endif
+
+	static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
+		VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
+		VkDebugUtilsMessageTypeFlagsEXT messageType,
+		const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
+		void* pUserData);
 
 
 	GLFWwindow* window;
@@ -73,33 +95,6 @@ struct RenderGU_Vk_Renderer
 	VkSwapchainKHR swapchain;
 	std::vector<VkImageView> ImageViewArray;
 	uint32_t SwapChainImageCount = 0;
-
-	static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
-		VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
-		VkDebugUtilsMessageTypeFlagsEXT messageType,
-		const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
-		void* pUserData);
-
-	void setupDebugMessenger();
-	
-	void destroyDebugMessenger();
-
-	void getPhysicalDevice();
-	void createLogicalDevice();
-	QueueFamilyIndices getQueueFamilyIndices(VkPhysicalDevice device);
-	SwapChainDesc CreateSwapChainDesc(VkPhysicalDevice);
-	void createSurface();
-	void createSwapChain();
-	void createImageViews();
-
-	// Validation Layers code
-	#ifdef NDEBUG
-		const bool validationLayers = false;
-	#else
-		const bool validationLayers = true;
-	#endif
-
-	bool validationLayerSupport();
 
 	VulkanValidationDesiredMsgSeverity* pVulkanValidationDesiredMsgSeverity = nullptr;
 };

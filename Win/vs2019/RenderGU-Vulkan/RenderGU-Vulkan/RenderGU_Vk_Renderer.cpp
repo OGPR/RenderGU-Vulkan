@@ -529,22 +529,21 @@ void RenderGU_Vk_Renderer::CreateSwapchain()
 void RenderGU_Vk_Renderer::CreateImageViews()
 {
 	assert(this->swapchain);
-	uint32_t _swapchainImageCount = 0;
+	assert(!this->SwapchainImageCount); // Precondition: our swapchain image count is initialised to zero
 	vkGetSwapchainImagesKHR(mainDevice.logicalDevice,
 		swapchain,
-		&_swapchainImageCount,
+		&this->SwapchainImageCount,
 		nullptr);
 
-	assert(_swapchainImageCount);
-	std::vector<VkImage> swapchainImageArray(_swapchainImageCount);
-	this->SwapchainImageCount = _swapchainImageCount;
+	assert(this->SwapchainImageCount); // Postcondition: our swapchain image count is not zero
+	std::vector<VkImage> swapchainImageArray(this->SwapchainImageCount);
 	vkGetSwapchainImagesKHR(mainDevice.logicalDevice,
 		swapchain,
-		&_swapchainImageCount,
+		&SwapchainImageCount,
 		swapchainImageArray.data());
 
 	assert(swapchainImageArray.size());
-	ImageViewArray.resize(_swapchainImageCount);
+	ImageViewArray.resize(SwapchainImageCount);
 
 	for (int i = 0; i < swapchainImageArray.size(); ++i)
 	{

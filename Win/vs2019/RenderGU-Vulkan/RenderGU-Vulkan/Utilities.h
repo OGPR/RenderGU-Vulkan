@@ -18,7 +18,7 @@ struct QueueFamilyIndices
 	}
 };
 
-struct SwapChainDesc
+struct SwapchainDesc
 {
 	VkSurfaceCapabilitiesKHR surfaceCapabilities;
 	std::vector<VkSurfaceFormatKHR> surfaceFormatArray;

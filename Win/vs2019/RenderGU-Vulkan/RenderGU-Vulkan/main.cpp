@@ -1,18 +1,19 @@
 #include <iostream>
 #include "VulkanWindow.h"
-#include "VulkanRenderer.h"
+#include "RenderGU_Vk_Renderer.h"
 #include <stdexcept>
 VulkanWindow vulkanWindow;
-VulkanValidationDesiredMsgSeverity vulkanValidationDesiredMsgSeverity;
 
-int main(int argc, char** argv)
+bool clArgsRead(int argc,
+                char** argv,
+                VulkanValidationDesiredMsgSeverity& vulkanValidationDesiredMsgSeverity)
 {
-    //---START CL ARGS ---//
     if (argc == 1)
     {
         // no extra args passed - Default behaviour
         // Vulkan Spec states message severity must not be zero, so let's default to error only 
         vulkanValidationDesiredMsgSeverity.State = vulkanValidationDesiredMsgSeverity.ERROR;
+        return true;
     }
     else if (argc > 1)
     {
@@ -31,7 +32,7 @@ int main(int argc, char** argv)
             if (*(NextArgStr + 1) == '\0')
             {
                 std::cout << "Require a cl option after -. See -h for more info" << std::endl;
-                return 1;
+                return false;
             }
 			// Okay, dealt with initial format, now matching chars
 			if (*(NextArgStr + 1) == 'h')
@@ -46,7 +47,7 @@ int main(int argc, char** argv)
                 std::cout << "" << std::endl;
                 std::cout << "Default behaviour is -e" << std::endl;
 				// We don't continue to run, help asked for!
-				return 0;
+				return false ;
 			}
 
             //Work through argument string
@@ -77,20 +78,24 @@ int main(int argc, char** argv)
                 }
 				++CurrArgStr;
             }
-
-
         }
-        // For Intial CL args testing (stop rest of program)
-        // TODO remove when ready
+        return true;
     }
-    
-    //---END CL ARGS ---//
+    return false; // argc should never be < 1 but we put this here anyway
+}
+
+int main(int argc, char** argv)
+{
+	VulkanValidationDesiredMsgSeverity vulkanValidationDesiredMsgSeverity;
+    if (!clArgsRead(argc, argv, vulkanValidationDesiredMsgSeverity))
+        return 1;
+
     GLFWwindow* window = vulkanWindow.init("RenderGU_Windows", 800, 600);
 
-	VulkanRenderer vulkanRenderer(&vulkanValidationDesiredMsgSeverity);
+	RenderGU_Vk_Renderer _RenderGU_Vk_Renderer(&vulkanValidationDesiredMsgSeverity);
     try
     {
-		vulkanRenderer.init(window);
+		_RenderGU_Vk_Renderer.Init(window);
     }
     catch (const std::exception& e)
     {
@@ -111,7 +116,7 @@ int main(int argc, char** argv)
         glfwPollEvents();
     }
 
-    vulkanRenderer.cleanup();
+    _RenderGU_Vk_Renderer.Cleanup();
 
     glfwDestroyWindow(window);
 

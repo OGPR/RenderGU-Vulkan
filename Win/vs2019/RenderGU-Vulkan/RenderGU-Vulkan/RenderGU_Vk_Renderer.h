@@ -51,7 +51,7 @@ struct RenderGU_Vk_Renderer
 	void CreateSurface();
 	void GetPhysicalDevice();
 	void CreateLogicalDevice();
-	void CreateSwapChain();
+	void CreateSwapchain();
 	void CreateImageViews();
 
 	void DestroyDebugMessenger();
@@ -62,7 +62,7 @@ struct RenderGU_Vk_Renderer
 	bool ValidationLayerSupport();
 	
 	QueueFamilyIndices GetQueueFamilyIndices(VkPhysicalDevice);
-	SwapChainDesc CreateSwapChainDesc(VkPhysicalDevice);
+	SwapchainDesc CreateSwapchainDesc(VkPhysicalDevice);
 
 	// Validation Layers code
 	#ifdef NDEBUG
@@ -94,7 +94,7 @@ struct RenderGU_Vk_Renderer
 	VkSurfaceKHR surface = nullptr;
 	VkSwapchainKHR swapchain;
 	std::vector<VkImageView> ImageViewArray;
-	uint32_t SwapChainImageCount = 0;
+	uint32_t SwapchainImageCount = 0;
 
 	VulkanValidationDesiredMsgSeverity* pVulkanValidationDesiredMsgSeverity = nullptr;
 };

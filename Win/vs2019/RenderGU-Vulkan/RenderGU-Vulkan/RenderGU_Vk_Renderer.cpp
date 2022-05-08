@@ -12,7 +12,7 @@ int RenderGU_Vk_Renderer::Init(GLFWwindow* window)
 	CreateSurface();
 	GetPhysicalDevice();
 	CreateLogicalDevice();
-	CreateSwapChain();
+	CreateSwapchain();
 	CreateImageViews();
 
 
@@ -96,7 +96,7 @@ void RenderGU_Vk_Renderer::Cleanup()
 	vkDestroySurfaceKHR(this->instance, this->surface, nullptr);
 
 	uint32_t count = 0;
-	while (count < this->SwapChainImageCount)
+	while (count < this->SwapchainImageCount)
 		vkDestroyImageView(mainDevice.logicalDevice, ImageViewArray[count++], nullptr);
 
 	vkDestroyDevice(mainDevice.logicalDevice, nullptr);
@@ -192,7 +192,7 @@ bool RenderGU_Vk_Renderer::CheckDeviceSuitable(VkPhysicalDevice device)
 			desiredPhyiscalDeviceExtenstions
 		);
 
-	bool swapChainDescValid = CreateSwapChainDesc(device).isValid();
+	bool swapChainDescValid = CreateSwapchainDesc(device).isValid();
 
 	return swapChainDescValid && desiredPhysicalDeviceExtensionsSupported && indices.isValid();
 }
@@ -410,13 +410,13 @@ void RenderGU_Vk_Renderer::CreateSurface()
 
 }
 
-SwapChainDesc RenderGU_Vk_Renderer::CreateSwapChainDesc(VkPhysicalDevice physicalDevice)
+SwapchainDesc RenderGU_Vk_Renderer::CreateSwapchainDesc(VkPhysicalDevice physicalDevice)
 {
-	SwapChainDesc swapChainDesc = {};
+	SwapchainDesc swapchainDesc = {};
 
 	// Surface Capabilities
 	assert(this->surface);
-	vkGetPhysicalDeviceSurfaceCapabilitiesKHR(physicalDevice, this->surface, &swapChainDesc.surfaceCapabilities);
+	vkGetPhysicalDeviceSurfaceCapabilitiesKHR(physicalDevice, this->surface, &swapchainDesc.surfaceCapabilities);
 
 	// Surface Formats
 	assert(this->surface);
@@ -424,8 +424,8 @@ SwapChainDesc RenderGU_Vk_Renderer::CreateSwapChainDesc(VkPhysicalDevice physica
 	vkGetPhysicalDeviceSurfaceFormatsKHR(physicalDevice, this->surface, &surfaceFormatCount, nullptr);
 
 	assert(surfaceFormatCount);
-	swapChainDesc.surfaceFormatArray.resize(surfaceFormatCount);
-	vkGetPhysicalDeviceSurfaceFormatsKHR(physicalDevice, this->surface, &surfaceFormatCount, swapChainDesc.surfaceFormatArray.data());
+	swapchainDesc.surfaceFormatArray.resize(surfaceFormatCount);
+	vkGetPhysicalDeviceSurfaceFormatsKHR(physicalDevice, this->surface, &surfaceFormatCount, swapchainDesc.surfaceFormatArray.data());
 
 	// Presentation modes
 	assert(this->surface);
@@ -433,22 +433,22 @@ SwapChainDesc RenderGU_Vk_Renderer::CreateSwapChainDesc(VkPhysicalDevice physica
 	vkGetPhysicalDeviceSurfacePresentModesKHR(physicalDevice, this->surface, &presentModeCount, nullptr);
 
 	assert(presentModeCount);
-	swapChainDesc.presentationModeArray.resize(presentModeCount);
-	vkGetPhysicalDeviceSurfacePresentModesKHR(physicalDevice, this->surface, &presentModeCount, swapChainDesc.presentationModeArray.data());
+	swapchainDesc.presentationModeArray.resize(presentModeCount);
+	vkGetPhysicalDeviceSurfacePresentModesKHR(physicalDevice, this->surface, &presentModeCount, swapchainDesc.presentationModeArray.data());
 
-	return swapChainDesc;
+	return swapchainDesc;
 
 }
 
-void RenderGU_Vk_Renderer::CreateSwapChain()
+void RenderGU_Vk_Renderer::CreateSwapchain()
 {
-	SwapChainDesc swapChainDesc = CreateSwapChainDesc(mainDevice.physicalDevice);
+	SwapchainDesc swapchainDesc = CreateSwapchainDesc(mainDevice.physicalDevice);
 
-	// Check if our desired surface format is available in SwapChainDesc
-	assert(swapChainDesc.surfaceFormatArray.size());
+	// Check if our desired surface format is available in SwapchainDesc
+	assert(swapchainDesc.surfaceFormatArray.size());
 	bool foundDesiredSurfaceFormat = false;
 	bool foundDesiredSurface = false;
-	for (VkSurfaceFormatKHR surfaceFormat : swapChainDesc.surfaceFormatArray)
+	for (VkSurfaceFormatKHR surfaceFormat : swapchainDesc.surfaceFormatArray)
 	{
 		if (surfaceFormat.format == VK_FORMAT_UNDEFINED)
 			throw std::runtime_error("Surface format undefined!");
@@ -467,10 +467,10 @@ void RenderGU_Vk_Renderer::CreateSwapChain()
 
 	
 
-	// Check if our desired present mode is available in SwapChainDesc
-	assert(swapChainDesc.presentationModeArray.size());
+	// Check if our desired present mode is available in SwapchainDesc
+	assert(swapchainDesc.presentationModeArray.size());
 	bool foundDesiredPresentMode = false;
-	for (VkPresentModeKHR presentMode : swapChainDesc.presentationModeArray)
+	for (VkPresentModeKHR presentMode : swapchainDesc.presentationModeArray)
 	{
 		if (presentMode == DesiredPresentation::Mode)
 		{
@@ -484,7 +484,7 @@ void RenderGU_Vk_Renderer::CreateSwapChain()
 		//TODO check with spec - we should be able to get FIFO
 
 	// Swap chain image resolution
-	if (swapChainDesc.surfaceCapabilities.currentExtent.width == UINT_FAST32_MAX)
+	if (swapchainDesc.surfaceCapabilities.currentExtent.width == UINT_FAST32_MAX)
 		throw std::runtime_error("Extent is changing");
 	//TODO handle this. Also use platform independent UINT max
 
@@ -505,11 +505,11 @@ void RenderGU_Vk_Renderer::CreateSwapChain()
 	swapChainCreateInfo.pQueueFamilyIndices = nullptr;
 	swapChainCreateInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
 	swapChainCreateInfo.surface = this->surface;
-	swapChainCreateInfo.preTransform = swapChainDesc.surfaceCapabilities.currentTransform;
+	swapChainCreateInfo.preTransform = swapchainDesc.surfaceCapabilities.currentTransform;
 	swapChainCreateInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
 	swapChainCreateInfo.imageArrayLayers = 1;
-	swapChainCreateInfo.imageExtent = swapChainDesc.surfaceCapabilities.currentExtent;
-	swapChainCreateInfo.minImageCount = swapChainDesc.surfaceCapabilities.minImageCount;
+	swapChainCreateInfo.imageExtent = swapchainDesc.surfaceCapabilities.currentExtent;
+	swapChainCreateInfo.minImageCount = swapchainDesc.surfaceCapabilities.minImageCount;
 	swapChainCreateInfo.imageFormat = DesiredSurfaceFormat::Format;
 	swapChainCreateInfo.imageColorSpace = DesiredSurfaceFormat::ColorSpace;
 	swapChainCreateInfo.clipped = VK_FALSE; // Yes,  false - I want images to own all their pixels
@@ -529,28 +529,28 @@ void RenderGU_Vk_Renderer::CreateSwapChain()
 void RenderGU_Vk_Renderer::CreateImageViews()
 {
 	assert(this->swapchain);
-	uint32_t swapChainImageCount = 0;
+	uint32_t _swapchainImageCount = 0;
 	vkGetSwapchainImagesKHR(mainDevice.logicalDevice,
 		swapchain,
-		&swapChainImageCount,
+		&_swapchainImageCount,
 		nullptr);
 
-	assert(swapChainImageCount);
-	std::vector<VkImage> swapChainImageArray(swapChainImageCount);
-	this->SwapChainImageCount = swapChainImageCount;
+	assert(_swapchainImageCount);
+	std::vector<VkImage> swapchainImageArray(_swapchainImageCount);
+	this->SwapchainImageCount = _swapchainImageCount;
 	vkGetSwapchainImagesKHR(mainDevice.logicalDevice,
 		swapchain,
-		&swapChainImageCount,
-		swapChainImageArray.data());
+		&_swapchainImageCount,
+		swapchainImageArray.data());
 
-	assert(swapChainImageArray.size());
-	ImageViewArray.resize(swapChainImageCount);
+	assert(swapchainImageArray.size());
+	ImageViewArray.resize(_swapchainImageCount);
 
-	for (int i = 0; i < swapChainImageArray.size(); ++i)
+	for (int i = 0; i < swapchainImageArray.size(); ++i)
 	{
 		VkImageViewCreateInfo ImageViewCreateInfo = {};
 		ImageViewCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-		ImageViewCreateInfo.image = swapChainImageArray[i];
+		ImageViewCreateInfo.image = swapchainImageArray[i];
 		ImageViewCreateInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
 		ImageViewCreateInfo.format = DesiredSurfaceFormat::Format;
 		ImageViewCreateInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;

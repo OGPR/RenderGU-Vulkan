@@ -2,6 +2,7 @@
 #include <iostream>
 #include <set>
 #include <assert.h>
+#include <fstream>
 
 int RenderGU_Vk_Renderer::Init(GLFWwindow* window)
 {
@@ -578,5 +579,23 @@ void RenderGU_Vk_Renderer::CreateImageViews()
 
 void RenderGU_Vk_Renderer::CreateGraphicsPipeline()
 {
-	throw std::runtime_error(std::string(__FUNCSIG__) + " not implemented");
+	assert(!VertexShaderModule && !FragmentShaderModule);
+
+	// Read the shader bytecode (for all shaders)
+	const std::string VertexShaderBytecodeFilename ="../../../../Shaders/bin/x64/vert.spv";
+	std::fstream VertexShaderBytecode(VertexShaderBytecodeFilename, std::ios::in | std::ios::ate | std::ios::binary);
+
+	if (!VertexShaderBytecode.is_open())
+		throw std::runtime_error("Failed to open " + VertexShaderBytecodeFilename);
+
+	long VertexShaderBytecodeFileSize = VertexShaderBytecode.tellg();
+
+	const std::string FragmentShaderBytecodeFilename ="../../../../Shaders/bin/x64/frag.spv";
+	std::fstream FragmentShaderBytecode(FragmentShaderBytecodeFilename, std::ios::in | std::ios::ate | std::ios::binary);
+
+	if (!FragmentShaderBytecode.is_open())
+		throw std::runtime_error("Failed to open " + FragmentShaderBytecodeFilename);
+
+	long FragmentShaderBytecodeFileSize = FragmentShaderBytecode.tellg();
+
 }

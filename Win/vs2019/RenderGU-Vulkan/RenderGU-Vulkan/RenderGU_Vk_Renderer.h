@@ -97,6 +97,9 @@ struct RenderGU_Vk_Renderer
 	std::vector<VkImageView> ImageViewArray;
 	uint32_t SwapchainImageCount = 0;
 
+	VkShaderModule* VertexShaderModule = nullptr;
+	VkShaderModule* FragmentShaderModule = nullptr;
+
 	VulkanValidationDesiredMsgSeverity* pVulkanValidationDesiredMsgSeverity = nullptr;
 };
 

@@ -604,8 +604,7 @@ void RenderGU_Vk_Renderer::CreateGraphicsPipeline()
 	FragmentShaderBytecode.seekg(0);
 	FragmentShaderBytecode.read(FragmentShaderBytecodeBuffer.data(), FragmentShaderBytecodeFileSize);
 
-
-
-
+	VertexShaderBytecode.close();
+	FragmentShaderBytecode.close();
 
 }

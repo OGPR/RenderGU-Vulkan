@@ -607,4 +607,46 @@ void RenderGU_Vk_Renderer::CreateGraphicsPipeline()
 	VertexShaderBytecode.close();
 	FragmentShaderBytecode.close();
 
+	// Create shader module
+	VkShaderModule VertexShaderModule;
+	VkShaderModule FragmentShaderModule;
+
+	VkShaderModuleCreateInfo VertexShaderModuleCreateInfo = {};
+	VertexShaderModuleCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+	VertexShaderModuleCreateInfo.codeSize = std::size(VertexShaderBytecodeBuffer);
+	VertexShaderModuleCreateInfo.pCode = (const uint32_t*)VertexShaderBytecodeBuffer.data();
+
+
+	assert(this->mainDevice.logicalDevice);
+	VkResult CreateVertexShaderModuleResult = vkCreateShaderModule(
+		this->mainDevice.logicalDevice,
+		&VertexShaderModuleCreateInfo,
+		nullptr,
+		&VertexShaderModule
+	);
+
+	if (CreateVertexShaderModuleResult != VK_SUCCESS)
+		throw std::runtime_error("Failed to create vertex shader module");
+
+	VkShaderModuleCreateInfo FragmentShaderModuleCreateInfo = {};
+	FragmentShaderModuleCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+	FragmentShaderModuleCreateInfo.codeSize = std::size(FragmentShaderBytecodeBuffer);
+	FragmentShaderModuleCreateInfo.pCode = (const uint32_t*)FragmentShaderBytecodeBuffer.data();
+
+	assert(this->mainDevice.logicalDevice);
+	VkResult CreateFragmentShaderModuleResult = vkCreateShaderModule(
+		this->mainDevice.logicalDevice,
+		&FragmentShaderModuleCreateInfo,
+		nullptr,
+		&FragmentShaderModule
+	);
+
+	if (CreateFragmentShaderModuleResult != VK_SUCCESS)
+		throw std::runtime_error("Failed to create fragment shader module");
+
+	vkDestroyShaderModule(this->mainDevice.logicalDevice, VertexShaderModule, nullptr);
+	vkDestroyShaderModule(this->mainDevice.logicalDevice, FragmentShaderModule, nullptr);
+
+
+
 }

@@ -589,6 +589,9 @@ void RenderGU_Vk_Renderer::CreateGraphicsPipeline()
 		throw std::runtime_error("Failed to open " + VertexShaderBytecodeFilename);
 
 	long VertexShaderBytecodeFileSize = VertexShaderBytecode.tellg();
+	std::vector<char> VertexShaderBytecodeBuffer(VertexShaderBytecodeFileSize);
+	VertexShaderBytecode.seekg(0);
+	VertexShaderBytecode.read(VertexShaderBytecodeBuffer.data(), VertexShaderBytecodeFileSize);
 
 	const std::string FragmentShaderBytecodeFilename ="../../../../Shaders/bin/x64/frag.spv";
 	std::fstream FragmentShaderBytecode(FragmentShaderBytecodeFilename, std::ios::in | std::ios::ate | std::ios::binary);
@@ -597,5 +600,12 @@ void RenderGU_Vk_Renderer::CreateGraphicsPipeline()
 		throw std::runtime_error("Failed to open " + FragmentShaderBytecodeFilename);
 
 	long FragmentShaderBytecodeFileSize = FragmentShaderBytecode.tellg();
+	std::vector<char> FragmentShaderBytecodeBuffer(FragmentShaderBytecodeFileSize);
+	FragmentShaderBytecode.seekg(0);
+	FragmentShaderBytecode.read(FragmentShaderBytecodeBuffer.data(), FragmentShaderBytecodeFileSize);
+
+
+
+
 
 }

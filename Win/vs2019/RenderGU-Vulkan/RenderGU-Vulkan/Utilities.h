@@ -1,5 +1,11 @@
 #pragma once
+#define GLFW_INCLUDE_VULKAN
+#include <GLFW/glfw3.h>
 #include <vector>
+#include <string>
+#include <fstream>
+
+using RenderGU_BytecodeBuffer = std::vector<char>;
 
 const std::vector<const char*> desiredPhyiscalDeviceExtenstions =
 {
@@ -29,4 +35,6 @@ struct SwapchainDesc
 		return std::size(surfaceFormatArray) && std::size(presentationModeArray);
 	}
 };
+
+RenderGU_BytecodeBuffer ReadBytecode(const std::string Filename);
 

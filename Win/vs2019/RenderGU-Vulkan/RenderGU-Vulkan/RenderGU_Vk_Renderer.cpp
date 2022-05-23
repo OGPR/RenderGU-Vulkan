@@ -2,7 +2,7 @@
 #include <iostream>
 #include <set>
 #include <assert.h>
-#include <fstream>
+
 
 int RenderGU_Vk_Renderer::Init(GLFWwindow* window)
 {
@@ -581,31 +581,11 @@ void RenderGU_Vk_Renderer::CreateGraphicsPipeline()
 {
 	assert(!VertexShaderModule && !FragmentShaderModule);
 
-	// Read the shader bytecode (for all shaders)
-	const std::string VertexShaderBytecodeFilename ="../../../../Shaders/bin/x64/vert.spv";
-	std::fstream VertexShaderBytecode(VertexShaderBytecodeFilename, std::ios::in | std::ios::ate | std::ios::binary);
+	const std::string VSBytecodeFilename ="../../../../Shaders/bin/x64/vert.spv";
+	const std::string FSBytecodeFilename ="../../../../Shaders/bin/x64/frag.spv";
 
-	if (!VertexShaderBytecode.is_open())
-		throw std::runtime_error("Failed to open " + VertexShaderBytecodeFilename);
-
-	long VertexShaderBytecodeFileSize = VertexShaderBytecode.tellg();
-	std::vector<char> VertexShaderBytecodeBuffer(VertexShaderBytecodeFileSize);
-	VertexShaderBytecode.seekg(0);
-	VertexShaderBytecode.read(VertexShaderBytecodeBuffer.data(), VertexShaderBytecodeFileSize);
-
-	const std::string FragmentShaderBytecodeFilename ="../../../../Shaders/bin/x64/frag.spv";
-	std::fstream FragmentShaderBytecode(FragmentShaderBytecodeFilename, std::ios::in | std::ios::ate | std::ios::binary);
-
-	if (!FragmentShaderBytecode.is_open())
-		throw std::runtime_error("Failed to open " + FragmentShaderBytecodeFilename);
-
-	long FragmentShaderBytecodeFileSize = FragmentShaderBytecode.tellg();
-	std::vector<char> FragmentShaderBytecodeBuffer(FragmentShaderBytecodeFileSize);
-	FragmentShaderBytecode.seekg(0);
-	FragmentShaderBytecode.read(FragmentShaderBytecodeBuffer.data(), FragmentShaderBytecodeFileSize);
-
-	VertexShaderBytecode.close();
-	FragmentShaderBytecode.close();
+	RenderGU_BytecodeBuffer VSBytecodeBuffer = ReadBytecode(VSBytecodeFilename);
+	RenderGU_BytecodeBuffer FSBytecodeBuffer = ReadBytecode(FSBytecodeFilename);
 
 	// Create shader module
 	VkShaderModule VertexShaderModule;
@@ -613,8 +593,8 @@ void RenderGU_Vk_Renderer::CreateGraphicsPipeline()
 
 	VkShaderModuleCreateInfo VertexShaderModuleCreateInfo = {};
 	VertexShaderModuleCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-	VertexShaderModuleCreateInfo.codeSize = std::size(VertexShaderBytecodeBuffer);
-	VertexShaderModuleCreateInfo.pCode = (const uint32_t*)VertexShaderBytecodeBuffer.data();
+	VertexShaderModuleCreateInfo.codeSize = std::size(VSBytecodeBuffer);
+	VertexShaderModuleCreateInfo.pCode = (const uint32_t*)VSBytecodeBuffer.data();
 
 
 	assert(this->mainDevice.logicalDevice);
@@ -630,8 +610,8 @@ void RenderGU_Vk_Renderer::CreateGraphicsPipeline()
 
 	VkShaderModuleCreateInfo FragmentShaderModuleCreateInfo = {};
 	FragmentShaderModuleCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-	FragmentShaderModuleCreateInfo.codeSize = std::size(FragmentShaderBytecodeBuffer);
-	FragmentShaderModuleCreateInfo.pCode = (const uint32_t*)FragmentShaderBytecodeBuffer.data();
+	FragmentShaderModuleCreateInfo.codeSize = std::size(FSBytecodeBuffer);
+	FragmentShaderModuleCreateInfo.pCode = (const uint32_t*)FSBytecodeBuffer.data();
 
 	assert(this->mainDevice.logicalDevice);
 	VkResult CreateFragmentShaderModuleResult = vkCreateShaderModule(
@@ -647,6 +627,5 @@ void RenderGU_Vk_Renderer::CreateGraphicsPipeline()
 	vkDestroyShaderModule(this->mainDevice.logicalDevice, VertexShaderModule, nullptr);
 	vkDestroyShaderModule(this->mainDevice.logicalDevice, FragmentShaderModule, nullptr);
 
-
-
 }
+

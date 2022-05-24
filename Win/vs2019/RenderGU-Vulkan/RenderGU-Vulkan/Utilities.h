@@ -37,4 +37,6 @@ struct SwapchainDesc
 };
 
 RenderGU_BytecodeBuffer ReadBytecode(const std::string Filename);
+VkShaderModule CreateShaderModule(VkDevice LogicalDevice,
+	RenderGU_BytecodeBuffer& BytecodeBuffer);
 

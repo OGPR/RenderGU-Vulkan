@@ -588,44 +588,12 @@ void RenderGU_Vk_Renderer::CreateGraphicsPipeline()
 	RenderGU_BytecodeBuffer FSBytecodeBuffer = ReadBytecode(FSBytecodeFilename);
 
 	// Create shader module
-	VkShaderModule VertexShaderModule;
-	VkShaderModule FragmentShaderModule;
-
-	VkShaderModuleCreateInfo VertexShaderModuleCreateInfo = {};
-	VertexShaderModuleCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-	VertexShaderModuleCreateInfo.codeSize = std::size(VSBytecodeBuffer);
-	VertexShaderModuleCreateInfo.pCode = (const uint32_t*)VSBytecodeBuffer.data();
+	VkShaderModule VSModule = CreateShaderModule(this->mainDevice.logicalDevice, VSBytecodeBuffer);
+	VkShaderModule FSModule = CreateShaderModule(this->mainDevice.logicalDevice, FSBytecodeBuffer);
 
 
-	assert(this->mainDevice.logicalDevice);
-	VkResult CreateVertexShaderModuleResult = vkCreateShaderModule(
-		this->mainDevice.logicalDevice,
-		&VertexShaderModuleCreateInfo,
-		nullptr,
-		&VertexShaderModule
-	);
-
-	if (CreateVertexShaderModuleResult != VK_SUCCESS)
-		throw std::runtime_error("Failed to create vertex shader module");
-
-	VkShaderModuleCreateInfo FragmentShaderModuleCreateInfo = {};
-	FragmentShaderModuleCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-	FragmentShaderModuleCreateInfo.codeSize = std::size(FSBytecodeBuffer);
-	FragmentShaderModuleCreateInfo.pCode = (const uint32_t*)FSBytecodeBuffer.data();
-
-	assert(this->mainDevice.logicalDevice);
-	VkResult CreateFragmentShaderModuleResult = vkCreateShaderModule(
-		this->mainDevice.logicalDevice,
-		&FragmentShaderModuleCreateInfo,
-		nullptr,
-		&FragmentShaderModule
-	);
-
-	if (CreateFragmentShaderModuleResult != VK_SUCCESS)
-		throw std::runtime_error("Failed to create fragment shader module");
-
-	vkDestroyShaderModule(this->mainDevice.logicalDevice, VertexShaderModule, nullptr);
-	vkDestroyShaderModule(this->mainDevice.logicalDevice, FragmentShaderModule, nullptr);
+	vkDestroyShaderModule(this->mainDevice.logicalDevice, VSModule, nullptr);
+	vkDestroyShaderModule(this->mainDevice.logicalDevice, FSModule, nullptr);
 
 }
 

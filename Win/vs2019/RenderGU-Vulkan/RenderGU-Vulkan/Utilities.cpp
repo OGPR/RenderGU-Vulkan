@@ -46,3 +46,21 @@ VkShaderModule CreateShaderModule(VkDevice LogicalDevice,
 	assert(ShaderModule);
 	return ShaderModule;
 }
+
+std::vector<VkPipelineShaderStageCreateInfo> CreateShaderStageInfoContainer(
+	std::vector<std::tuple<VkShaderModule, VkShaderStageFlagBits, const char*>>& ShaderInfoContainer)
+{
+	std::vector<VkPipelineShaderStageCreateInfo> OutputContainer;
+	for (auto& ShaderInfo : ShaderInfoContainer)
+	{
+		VkPipelineShaderStageCreateInfo StageInfo = {};
+		StageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+		StageInfo.stage = std::get<1>(ShaderInfo);
+		StageInfo.module = std::get<0>(ShaderInfo);
+		StageInfo.pName = std::get<2>(ShaderInfo);
+		
+		OutputContainer.push_back(StageInfo);
+	}
+
+	return OutputContainer;
+}

@@ -592,8 +592,13 @@ void RenderGU_Vk_Renderer::CreateGraphicsPipeline()
 	VkShaderModule FSModule = CreateShaderModule(this->mainDevice.logicalDevice, FSBytecodeBuffer);
 
 
+	auto VS_ShaderInfo = std::tuple(VSModule, VK_SHADER_STAGE_VERTEX_BIT, "main");
+	auto FS_ShaderInfo = std::tuple(FSModule, VK_SHADER_STAGE_FRAGMENT_BIT, "main");
+	auto ShaderInfoContainer = std::vector{ VS_ShaderInfo, FS_ShaderInfo };
+
+	auto ShaderStageInfoContainer = CreateShaderStageInfoContainer(ShaderInfoContainer);
+
 	vkDestroyShaderModule(this->mainDevice.logicalDevice, VSModule, nullptr);
 	vkDestroyShaderModule(this->mainDevice.logicalDevice, FSModule, nullptr);
-
 }
 

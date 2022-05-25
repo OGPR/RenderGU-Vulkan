@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <fstream>
+#include <tuple>
 
 using RenderGU_BytecodeBuffer = std::vector<char>;
 
@@ -40,3 +41,5 @@ RenderGU_BytecodeBuffer ReadBytecode(const std::string Filename);
 VkShaderModule CreateShaderModule(VkDevice LogicalDevice,
 	RenderGU_BytecodeBuffer& BytecodeBuffer);
 
+std::vector<VkPipelineShaderStageCreateInfo> CreateShaderStageInfoContainer(
+	std::vector<std::tuple<VkShaderModule, VkShaderStageFlagBits, const char*>>& ShaderInfoContainer);

@@ -43,3 +43,9 @@ VkShaderModule CreateShaderModule(VkDevice LogicalDevice,
 
 std::vector<VkPipelineShaderStageCreateInfo> CreateShaderStageInfoContainer(
 	std::vector<std::tuple<VkShaderModule, VkShaderStageFlagBits, const char*>>& ShaderInfoContainer);
+
+VkPipelineShaderStageCreateInfo CreateShaderStageInfo(
+	VkShaderModule ShaderModule,
+	VkShaderStageFlagBits ShaderStageFlagBits,
+	const char* ShaderEntryPointName
+);

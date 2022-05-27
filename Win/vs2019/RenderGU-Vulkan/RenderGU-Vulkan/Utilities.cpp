@@ -64,3 +64,18 @@ std::vector<VkPipelineShaderStageCreateInfo> CreateShaderStageInfoContainer(
 
 	return OutputContainer;
 }
+
+VkPipelineShaderStageCreateInfo CreateShaderStageInfo(
+	VkShaderModule ShaderModule,
+	VkShaderStageFlagBits ShaderStageFlagBits,
+	const char* ShaderEntryPointName
+)
+{
+	VkPipelineShaderStageCreateInfo ShaderStageInfo = {};
+	ShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+	ShaderStageInfo.stage = ShaderStageFlagBits;
+	ShaderStageInfo.module = ShaderModule;
+	ShaderStageInfo.pName = ShaderEntryPointName;
+
+	return ShaderStageInfo;
+}

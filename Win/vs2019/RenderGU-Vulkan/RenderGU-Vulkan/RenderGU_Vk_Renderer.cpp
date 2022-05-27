@@ -584,17 +584,17 @@ void RenderGU_Vk_Renderer::CreateGraphicsPipeline()
 	const std::string VSBytecodeFilename ="../../../../Shaders/bin/x64/vert.spv";
 	const std::string FSBytecodeFilename ="../../../../Shaders/bin/x64/frag.spv";
 
-	RenderGU_BytecodeBuffer VSBytecodeBuffer = ReadBytecode(VSBytecodeFilename);
-	RenderGU_BytecodeBuffer FSBytecodeBuffer = ReadBytecode(FSBytecodeFilename);
+	RenderGU_BytecodeBuffer VSBytecodeBuffer = RenderGU_Vk_Utils::ReadBytecode(VSBytecodeFilename);
+	RenderGU_BytecodeBuffer FSBytecodeBuffer = RenderGU_Vk_Utils::ReadBytecode(FSBytecodeFilename);
 
 	// Create shader module
-	VkShaderModule VSModule = CreateShaderModule(this->mainDevice.logicalDevice, VSBytecodeBuffer);
-	VkShaderModule FSModule = CreateShaderModule(this->mainDevice.logicalDevice, FSBytecodeBuffer);
+	VkShaderModule VSModule = RenderGU_Vk_Utils::CreateShaderModule(this->mainDevice.logicalDevice, VSBytecodeBuffer);
+	VkShaderModule FSModule = RenderGU_Vk_Utils::CreateShaderModule(this->mainDevice.logicalDevice, FSBytecodeBuffer);
 
 	VkPipelineShaderStageCreateInfo ShaderStageInfoArray[] =
 	{
-		CreateShaderStageInfo(VSModule, VK_SHADER_STAGE_VERTEX_BIT, "main"),
-		CreateShaderStageInfo(FSModule, VK_SHADER_STAGE_FRAGMENT_BIT, "main"),
+		RenderGU_Vk_Utils::CreateShaderStageInfo(VSModule, VK_SHADER_STAGE_VERTEX_BIT, "main"),
+		RenderGU_Vk_Utils::CreateShaderStageInfo(FSModule, VK_SHADER_STAGE_FRAGMENT_BIT, "main"),
 
 	};
 

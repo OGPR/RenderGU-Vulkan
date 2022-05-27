@@ -37,15 +37,19 @@ struct SwapchainDesc
 	}
 };
 
-RenderGU_BytecodeBuffer ReadBytecode(const std::string Filename);
-VkShaderModule CreateShaderModule(VkDevice LogicalDevice,
-	RenderGU_BytecodeBuffer& BytecodeBuffer);
+namespace RenderGU_Vk_Utils
+{
+	RenderGU_BytecodeBuffer ReadBytecode(const std::string Filename);
 
-std::vector<VkPipelineShaderStageCreateInfo> CreateShaderStageInfoContainer(
-	std::vector<std::tuple<VkShaderModule, VkShaderStageFlagBits, const char*>>& ShaderInfoContainer);
+	VkShaderModule CreateShaderModule(VkDevice LogicalDevice,
+		RenderGU_BytecodeBuffer& BytecodeBuffer);
 
-VkPipelineShaderStageCreateInfo CreateShaderStageInfo(
-	VkShaderModule ShaderModule,
-	VkShaderStageFlagBits ShaderStageFlagBits,
-	const char* ShaderEntryPointName
-);
+	std::vector<VkPipelineShaderStageCreateInfo> CreateShaderStageInfoContainer(
+		std::vector<std::tuple<VkShaderModule, VkShaderStageFlagBits, const char*>>& ShaderInfoContainer);
+
+	VkPipelineShaderStageCreateInfo CreateShaderStageInfo(
+		VkShaderModule ShaderModule,
+		VkShaderStageFlagBits ShaderStageFlagBits,
+		const char* ShaderEntryPointName
+	);
+}

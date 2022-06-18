@@ -648,6 +648,14 @@ void RenderGU_Vk_Renderer::CreateGraphicsPipeline()
 	MultisampleStateInfo.sampleShadingEnable = VK_FALSE;
 	MultisampleStateInfo.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
 
+	// Color blending
+	VkPipelineColorBlendAttachmentState ColorBlendAttachmentState{};
+	ColorBlendAttachmentState.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
+	ColorBlendAttachmentState.blendEnable = VK_FALSE;
+
+
+
+
 
 
 

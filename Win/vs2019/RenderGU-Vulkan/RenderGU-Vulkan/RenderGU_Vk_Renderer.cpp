@@ -659,6 +659,18 @@ void RenderGU_Vk_Renderer::CreateGraphicsPipeline()
 	ColorBlendState.attachmentCount = 1;
 	ColorBlendState.pAttachments = &ColorBlendAttachmentState;
 
+	// Dynamic State
+	std::vector<VkDynamicState> DynamicStateContainer =
+	{
+		VK_DYNAMIC_STATE_VIEWPORT,
+		VK_DYNAMIC_STATE_LINE_WIDTH
+	};
+
+	VkPipelineDynamicStateCreateInfo DynamicStateInfo{};
+	DynamicStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
+	DynamicStateInfo.dynamicStateCount = std::size(DynamicStateContainer);
+	DynamicStateInfo.pDynamicStates = DynamicStateContainer.data();
+
 	
 
 

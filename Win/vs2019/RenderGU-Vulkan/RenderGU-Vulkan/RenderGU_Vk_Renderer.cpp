@@ -595,9 +595,15 @@ void RenderGU_Vk_Renderer::CreateGraphicsPipeline()
 	{
 		RenderGU_Vk_Utils::CreateShaderStageInfo(VSModule, VK_SHADER_STAGE_VERTEX_BIT, "main"),
 		RenderGU_Vk_Utils::CreateShaderStageInfo(FSModule, VK_SHADER_STAGE_FRAGMENT_BIT, "main"),
-
 	};
 
+
+	// Vertex Input
+	// Vertex data currently hardcoded into VS so vertex data to specify here
+	VkPipelineVertexInputStateCreateInfo VertexInputInfo = {};
+	VertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+
+	// Destroy shader modules
 	vkDestroyShaderModule(this->mainDevice.logicalDevice, VSModule, nullptr);
 	vkDestroyShaderModule(this->mainDevice.logicalDevice, FSModule, nullptr);
 }

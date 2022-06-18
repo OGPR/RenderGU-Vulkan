@@ -101,6 +101,7 @@ void RenderGU_Vk_Renderer::Cleanup()
 	while (count < this->SwapchainImageCount)
 		vkDestroyImageView(mainDevice.logicalDevice, ImageViewArray[count++], nullptr);
 
+	vkDestroyPipelineLayout(mainDevice.logicalDevice, PipelineLayout, nullptr);
 	vkDestroyDevice(mainDevice.logicalDevice, nullptr);
 	vkDestroyInstance(this->instance, nullptr);
 
@@ -670,6 +671,18 @@ void RenderGU_Vk_Renderer::CreateGraphicsPipeline()
 	DynamicStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
 	DynamicStateInfo.dynamicStateCount = std::size(DynamicStateContainer);
 	DynamicStateInfo.pDynamicStates = DynamicStateContainer.data();
+
+	// Pipeline layout
+	assert(!PipelineLayout);
+	VkPipelineLayoutCreateInfo PipelineLayoutCreateInfo{};
+	PipelineLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+
+	VkResult CreatePipelineLayoutResult = vkCreatePipelineLayout(this->mainDevice.logicalDevice, &PipelineLayoutCreateInfo, nullptr, &PipelineLayout);
+	if (CreatePipelineLayoutResult != VK_SUCCESS)
+		throw std::runtime_error("Pipeline layout creation failed!");
+	assert(PipelineLayout);
+
+	
 
 	
 

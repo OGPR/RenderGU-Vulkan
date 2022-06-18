@@ -101,6 +101,7 @@ void RenderGU_Vk_Renderer::Cleanup()
 	while (count < this->SwapchainImageCount)
 		vkDestroyImageView(mainDevice.logicalDevice, ImageViewArray[count++], nullptr);
 
+	vkDestroyPipelineLayout(mainDevice.logicalDevice, PipelineLayout, nullptr);
 	vkDestroyDevice(mainDevice.logicalDevice, nullptr);
 	vkDestroyInstance(this->instance, nullptr);
 
@@ -524,7 +525,7 @@ void RenderGU_Vk_Renderer::CreateSwapchain()
 	);
 
 	assert(&this->swapchain);
-
+	this->ImageExtent = swapChainCreateInfo.imageExtent;
 	
 }
 
@@ -595,9 +596,106 @@ void RenderGU_Vk_Renderer::CreateGraphicsPipeline()
 	{
 		RenderGU_Vk_Utils::CreateShaderStageInfo(VSModule, VK_SHADER_STAGE_VERTEX_BIT, "main"),
 		RenderGU_Vk_Utils::CreateShaderStageInfo(FSModule, VK_SHADER_STAGE_FRAGMENT_BIT, "main"),
-
 	};
 
+
+	// Vertex Input
+	// Vertex data currently hardcoded into VS so vertex data to specify here
+	VkPipelineVertexInputStateCreateInfo VertexInputInfo = {};
+	VertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+
+	// Input Assembly
+	VkPipelineInputAssemblyStateCreateInfo InputAssemblyInfo = {};
+	InputAssemblyInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
+	InputAssemblyInfo.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+	InputAssemblyInfo.primitiveRestartEnable = VK_FALSE;
+
+	// Viewport - region of framebuffer that output will be rendered to
+	VkViewport Viewport{};
+	Viewport.x = 0.0f;
+	Viewport.y = 0.0f;
+	Viewport.width = (float)ImageExtent.width;
+	Viewport.height = (float)ImageExtent.height;
+	Viewport.minDepth = 0.0f;
+	Viewport.maxDepth = 1.0f;
+
+	// Scissor
+	VkRect2D Scissor{};
+	Scissor.offset = { 0, 0 };
+	Scissor.extent = ImageExtent;
+
+	// Create viewport state from Viewport and Scissor specifications
+	VkPipelineViewportStateCreateInfo ViewportStateInfo{};
+	ViewportStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+	ViewportStateInfo.viewportCount = 1;
+	ViewportStateInfo.pViewports = &Viewport;
+	ViewportStateInfo.scissorCount = 1;
+	ViewportStateInfo.pScissors = &Scissor;
+
+	// Rasterizer
+	VkPipelineRasterizationStateCreateInfo RasterizerStateInfo{};
+	RasterizerStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
+	RasterizerStateInfo.depthClampEnable = VK_FALSE;
+	RasterizerStateInfo.rasterizerDiscardEnable = VK_FALSE;
+	RasterizerStateInfo.polygonMode = VK_POLYGON_MODE_FILL;
+	RasterizerStateInfo.lineWidth = 1.0f;
+	RasterizerStateInfo.cullMode = VK_CULL_MODE_BACK_BIT;
+	RasterizerStateInfo.frontFace = VK_FRONT_FACE_CLOCKWISE;
+	RasterizerStateInfo.depthBiasEnable = VK_FALSE;
+	
+	// Multisampling
+	VkPipelineMultisampleStateCreateInfo MultisampleStateInfo{};
+	MultisampleStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
+	MultisampleStateInfo.sampleShadingEnable = VK_FALSE;
+	MultisampleStateInfo.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
+
+	// Color blending
+	VkPipelineColorBlendAttachmentState ColorBlendAttachmentState{};
+	ColorBlendAttachmentState.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
+	ColorBlendAttachmentState.blendEnable = VK_FALSE;
+
+	VkPipelineColorBlendStateCreateInfo ColorBlendState{};
+	ColorBlendState.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
+	ColorBlendState.logicOpEnable = VK_FALSE;
+	ColorBlendState.attachmentCount = 1;
+	ColorBlendState.pAttachments = &ColorBlendAttachmentState;
+
+	// Dynamic State
+	std::vector<VkDynamicState> DynamicStateContainer =
+	{
+		VK_DYNAMIC_STATE_VIEWPORT,
+		VK_DYNAMIC_STATE_LINE_WIDTH
+	};
+
+	VkPipelineDynamicStateCreateInfo DynamicStateInfo{};
+	DynamicStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
+	DynamicStateInfo.dynamicStateCount = std::size(DynamicStateContainer);
+	DynamicStateInfo.pDynamicStates = DynamicStateContainer.data();
+
+	// Pipeline layout
+	assert(!PipelineLayout);
+	VkPipelineLayoutCreateInfo PipelineLayoutCreateInfo{};
+	PipelineLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+
+	VkResult CreatePipelineLayoutResult = vkCreatePipelineLayout(this->mainDevice.logicalDevice, &PipelineLayoutCreateInfo, nullptr, &PipelineLayout);
+	if (CreatePipelineLayoutResult != VK_SUCCESS)
+		throw std::runtime_error("Pipeline layout creation failed!");
+	assert(PipelineLayout);
+
+	
+
+	
+
+
+
+
+
+
+
+	
+
+
+	// Destroy shader modules
 	vkDestroyShaderModule(this->mainDevice.logicalDevice, VSModule, nullptr);
 	vkDestroyShaderModule(this->mainDevice.logicalDevice, FSModule, nullptr);
 }

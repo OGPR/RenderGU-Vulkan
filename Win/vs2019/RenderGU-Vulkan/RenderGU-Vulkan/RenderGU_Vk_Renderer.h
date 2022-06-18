@@ -96,6 +96,8 @@ struct RenderGU_Vk_Renderer
 	VkSwapchainKHR swapchain;
 	std::vector<VkImageView> ImageViewArray;
 	uint32_t SwapchainImageCount = 0;
+	VkExtent2D ImageExtent;
+	VkPipelineLayout PipelineLayout = nullptr;
 
 	VkShaderModule* VertexShaderModule = nullptr;
 	VkShaderModule* FragmentShaderModule = nullptr;

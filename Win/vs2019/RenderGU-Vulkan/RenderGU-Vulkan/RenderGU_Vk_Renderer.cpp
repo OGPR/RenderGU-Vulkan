@@ -603,6 +603,12 @@ void RenderGU_Vk_Renderer::CreateGraphicsPipeline()
 	VkPipelineVertexInputStateCreateInfo VertexInputInfo = {};
 	VertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
 
+	// Input Assembly
+	VkPipelineInputAssemblyStateCreateInfo InputAssemblyInfo = {};
+	InputAssemblyInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
+	InputAssemblyInfo.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+	InputAssemblyInfo.primitiveRestartEnable = VK_FALSE;
+
 	// Destroy shader modules
 	vkDestroyShaderModule(this->mainDevice.logicalDevice, VSModule, nullptr);
 	vkDestroyShaderModule(this->mainDevice.logicalDevice, FSModule, nullptr);

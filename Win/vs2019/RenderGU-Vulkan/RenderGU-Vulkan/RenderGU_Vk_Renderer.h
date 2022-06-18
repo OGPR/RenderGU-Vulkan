@@ -53,6 +53,7 @@ struct RenderGU_Vk_Renderer
 	void CreateLogicalDevice();
 	void CreateSwapchain();
 	void CreateImageViews();
+	void CreateGraphicsPipeline();
 
 	void DestroyDebugMessenger();
 	void Cleanup();
@@ -95,6 +96,9 @@ struct RenderGU_Vk_Renderer
 	VkSwapchainKHR swapchain;
 	std::vector<VkImageView> ImageViewArray;
 	uint32_t SwapchainImageCount = 0;
+
+	VkShaderModule* VertexShaderModule = nullptr;
+	VkShaderModule* FragmentShaderModule = nullptr;
 
 	VulkanValidationDesiredMsgSeverity* pVulkanValidationDesiredMsgSeverity = nullptr;
 };

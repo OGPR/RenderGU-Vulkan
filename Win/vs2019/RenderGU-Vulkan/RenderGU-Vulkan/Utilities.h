@@ -1,5 +1,12 @@
 #pragma once
+#define GLFW_INCLUDE_VULKAN
+#include <GLFW/glfw3.h>
 #include <vector>
+#include <string>
+#include <fstream>
+#include <tuple>
+
+using RenderGU_BytecodeBuffer = std::vector<char>;
 
 const std::vector<const char*> desiredPhyiscalDeviceExtenstions =
 {
@@ -30,3 +37,19 @@ struct SwapchainDesc
 	}
 };
 
+namespace RenderGU_Vk_Utils
+{
+	RenderGU_BytecodeBuffer ReadBytecode(const std::string Filename);
+
+	VkShaderModule CreateShaderModule(VkDevice LogicalDevice,
+		RenderGU_BytecodeBuffer& BytecodeBuffer);
+
+	std::vector<VkPipelineShaderStageCreateInfo> CreateShaderStageInfoContainer(
+		std::vector<std::tuple<VkShaderModule, VkShaderStageFlagBits, const char*>>& ShaderInfoContainer);
+
+	VkPipelineShaderStageCreateInfo CreateShaderStageInfo(
+		VkShaderModule ShaderModule,
+		VkShaderStageFlagBits ShaderStageFlagBits,
+		const char* ShaderEntryPointName
+	);
+}

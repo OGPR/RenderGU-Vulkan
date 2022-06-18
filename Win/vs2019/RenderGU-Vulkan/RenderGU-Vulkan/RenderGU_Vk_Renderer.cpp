@@ -623,6 +623,14 @@ void RenderGU_Vk_Renderer::CreateGraphicsPipeline()
 	Scissor.offset = { 0, 0 };
 	Scissor.extent = ImageExtent;
 
+	// Create viewport state from Viewport and Scissor specifications
+	VkPipelineViewportStateCreateInfo ViewportStateInfo{};
+	ViewportStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+	ViewportStateInfo.viewportCount = 1;
+	ViewportStateInfo.pViewports = &Viewport;
+	ViewportStateInfo.scissorCount = 1;
+	ViewportStateInfo.pScissors = &Scissor;
+
 
 
 	

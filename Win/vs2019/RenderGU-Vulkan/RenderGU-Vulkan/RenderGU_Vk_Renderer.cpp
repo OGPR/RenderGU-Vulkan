@@ -631,6 +631,19 @@ void RenderGU_Vk_Renderer::CreateGraphicsPipeline()
 	ViewportStateInfo.scissorCount = 1;
 	ViewportStateInfo.pScissors = &Scissor;
 
+	// Rasterizer
+	VkPipelineRasterizationStateCreateInfo RasterizerStateInfo{};
+	RasterizerStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
+	RasterizerStateInfo.depthClampEnable = VK_FALSE;
+	RasterizerStateInfo.rasterizerDiscardEnable = VK_FALSE;
+	RasterizerStateInfo.polygonMode = VK_POLYGON_MODE_FILL;
+	RasterizerStateInfo.lineWidth = 1.0f;
+	RasterizerStateInfo.cullMode = VK_CULL_MODE_BACK_BIT;
+	RasterizerStateInfo.frontFace = VK_FRONT_FACE_CLOCKWISE;
+	RasterizerStateInfo.depthBiasEnable = VK_FALSE;
+
+
+
 
 
 	

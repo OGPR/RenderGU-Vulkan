@@ -641,7 +641,12 @@ void RenderGU_Vk_Renderer::CreateGraphicsPipeline()
 	RasterizerStateInfo.cullMode = VK_CULL_MODE_BACK_BIT;
 	RasterizerStateInfo.frontFace = VK_FRONT_FACE_CLOCKWISE;
 	RasterizerStateInfo.depthBiasEnable = VK_FALSE;
-
+	
+	// Multisampling
+	VkPipelineMultisampleStateCreateInfo MultisampleStateInfo{};
+	MultisampleStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
+	MultisampleStateInfo.sampleShadingEnable = VK_FALSE;
+	MultisampleStateInfo.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
 
 
 

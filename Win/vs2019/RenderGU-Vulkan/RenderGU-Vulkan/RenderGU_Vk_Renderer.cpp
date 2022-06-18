@@ -524,7 +524,7 @@ void RenderGU_Vk_Renderer::CreateSwapchain()
 	);
 
 	assert(&this->swapchain);
-
+	this->ImageExtent = swapChainCreateInfo.imageExtent;
 	
 }
 
@@ -608,6 +608,25 @@ void RenderGU_Vk_Renderer::CreateGraphicsPipeline()
 	InputAssemblyInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
 	InputAssemblyInfo.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
 	InputAssemblyInfo.primitiveRestartEnable = VK_FALSE;
+
+	// Viewport - region of framebuffer that output will be rendered to
+	VkViewport Viewport{};
+	Viewport.x = 0.0f;
+	Viewport.y = 0.0f;
+	Viewport.width = (float)ImageExtent.width;
+	Viewport.height = (float)ImageExtent.height;
+	Viewport.minDepth = 0.0f;
+	Viewport.maxDepth = 1.0f;
+
+	// Scissor
+	VkRect2D Scissor{};
+	Scissor.offset = { 0, 0 };
+	Scissor.extent = ImageExtent;
+
+
+
+	
+
 
 	// Destroy shader modules
 	vkDestroyShaderModule(this->mainDevice.logicalDevice, VSModule, nullptr);

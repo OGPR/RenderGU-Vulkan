@@ -653,6 +653,14 @@ void RenderGU_Vk_Renderer::CreateGraphicsPipeline()
 	ColorBlendAttachmentState.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
 	ColorBlendAttachmentState.blendEnable = VK_FALSE;
 
+	VkPipelineColorBlendStateCreateInfo ColorBlendState{};
+	ColorBlendState.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
+	ColorBlendState.logicOpEnable = VK_FALSE;
+	ColorBlendState.attachmentCount = 1;
+	ColorBlendState.pAttachments = &ColorBlendAttachmentState;
+
+	
+
 
 
 

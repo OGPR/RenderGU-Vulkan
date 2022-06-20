@@ -15,6 +15,7 @@ int RenderGU_Vk_Renderer::Init(GLFWwindow* window)
 	CreateLogicalDevice();
 	CreateSwapchain();
 	CreateImageViews();
+	CreateRenderPass();
 	CreateGraphicsPipeline();
 
 
@@ -102,6 +103,7 @@ void RenderGU_Vk_Renderer::Cleanup()
 		vkDestroyImageView(mainDevice.logicalDevice, ImageViewArray[count++], nullptr);
 
 	vkDestroyPipelineLayout(mainDevice.logicalDevice, PipelineLayout, nullptr);
+	vkDestroyRenderPass(mainDevice.logicalDevice, RenderPass, nullptr);
 	vkDestroyDevice(mainDevice.logicalDevice, nullptr);
 	vkDestroyInstance(this->instance, nullptr);
 
@@ -576,6 +578,47 @@ void RenderGU_Vk_Renderer::CreateImageViews()
 		assert(ImageViewArray[i]);
 	}
 
+}
+void RenderGU_Vk_Renderer::CreateRenderPass()
+{
+	// Attachments for subpasses to use
+	VkAttachmentDescription ColorAttachment = {};
+	ColorAttachment.format = DesiredSurfaceFormat::Format;
+	ColorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
+	ColorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+	ColorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+	ColorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+	ColorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+	ColorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+	ColorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+
+	// Our one and only subpass
+	VkAttachmentReference ColorAttachmentRef = {};
+	ColorAttachmentRef.attachment = 0;
+	ColorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+
+	// Set up our subpass
+	VkSubpassDescription SubpassDescription = {};
+	SubpassDescription.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS; // I.e not compute
+	SubpassDescription.colorAttachmentCount = 1;
+	SubpassDescription.pColorAttachments = &ColorAttachmentRef;
+
+	// Setup the render pass
+	VkRenderPassCreateInfo RenderPassCreateInfo = {};
+	RenderPassCreateInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+	RenderPassCreateInfo.attachmentCount = 1;
+	RenderPassCreateInfo.pAttachments = &ColorAttachment;
+	RenderPassCreateInfo.subpassCount = 1;
+	RenderPassCreateInfo.pSubpasses = &SubpassDescription;
+
+	assert(!this->RenderPass);
+	VkResult CreateRenderPassResult = vkCreateRenderPass(this->mainDevice.logicalDevice,
+		&RenderPassCreateInfo,
+		nullptr, &this->RenderPass);
+	if (CreateRenderPassResult != VK_SUCCESS)
+		throw std::runtime_error("Failed to create Render Pass!");
+	
+	assert(this->RenderPass);
 }
 
 void RenderGU_Vk_Renderer::CreateGraphicsPipeline()

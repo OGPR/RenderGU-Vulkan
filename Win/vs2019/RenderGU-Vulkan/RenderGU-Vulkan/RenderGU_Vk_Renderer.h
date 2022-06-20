@@ -53,6 +53,7 @@ struct RenderGU_Vk_Renderer
 	void CreateLogicalDevice();
 	void CreateSwapchain();
 	void CreateImageViews();
+	void CreateRenderPass();
 	void CreateGraphicsPipeline();
 
 	void DestroyDebugMessenger();
@@ -97,6 +98,7 @@ struct RenderGU_Vk_Renderer
 	std::vector<VkImageView> ImageViewArray;
 	uint32_t SwapchainImageCount = 0;
 	VkExtent2D ImageExtent;
+	VkRenderPass RenderPass = nullptr;
 	VkPipelineLayout PipelineLayout = nullptr;
 
 	VkShaderModule* VertexShaderModule = nullptr;

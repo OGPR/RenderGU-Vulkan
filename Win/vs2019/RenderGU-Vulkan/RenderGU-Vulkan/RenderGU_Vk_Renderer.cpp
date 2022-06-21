@@ -102,6 +102,7 @@ void RenderGU_Vk_Renderer::Cleanup()
 	while (count < this->SwapchainImageCount)
 		vkDestroyImageView(mainDevice.logicalDevice, ImageViewArray[count++], nullptr);
 
+	vkDestroyPipeline(mainDevice.logicalDevice, GraphicsPipeline, nullptr);
 	vkDestroyPipelineLayout(mainDevice.logicalDevice, PipelineLayout, nullptr);
 	vkDestroyRenderPass(mainDevice.logicalDevice, RenderPass, nullptr);
 	vkDestroyDevice(mainDevice.logicalDevice, nullptr);
@@ -635,7 +636,7 @@ void RenderGU_Vk_Renderer::CreateGraphicsPipeline()
 	VkShaderModule VSModule = RenderGU_Vk_Utils::CreateShaderModule(this->mainDevice.logicalDevice, VSBytecodeBuffer);
 	VkShaderModule FSModule = RenderGU_Vk_Utils::CreateShaderModule(this->mainDevice.logicalDevice, FSBytecodeBuffer);
 
-	VkPipelineShaderStageCreateInfo ShaderStageInfoArray[] =
+	std::vector<VkPipelineShaderStageCreateInfo> ShaderStageInfoContainer =
 	{
 		RenderGU_Vk_Utils::CreateShaderStageInfo(VSModule, VK_SHADER_STAGE_VERTEX_BIT, "main"),
 		RenderGU_Vk_Utils::CreateShaderStageInfo(FSModule, VK_SHADER_STAGE_FRAGMENT_BIT, "main"),
@@ -724,22 +725,37 @@ void RenderGU_Vk_Renderer::CreateGraphicsPipeline()
 	if (CreatePipelineLayoutResult != VK_SUCCESS)
 		throw std::runtime_error("Pipeline layout creation failed!");
 	assert(PipelineLayout);
-
 	
+	assert (this->RenderPass);
+	assert (this->PipelineLayout);
 
+	// Now ready to create the graphics pipeline!
+	VkGraphicsPipelineCreateInfo GraphicsPipelineCreateInfo = {};
+	GraphicsPipelineCreateInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+	GraphicsPipelineCreateInfo.stageCount = static_cast<uint32_t>(std::size(ShaderStageInfoContainer));
+	GraphicsPipelineCreateInfo.pStages = ShaderStageInfoContainer.data();
+	GraphicsPipelineCreateInfo.pVertexInputState = &VertexInputInfo;
+	GraphicsPipelineCreateInfo.pInputAssemblyState = &InputAssemblyInfo;
+	GraphicsPipelineCreateInfo.pViewportState = &ViewportStateInfo;
+	GraphicsPipelineCreateInfo.pRasterizationState = &RasterizerStateInfo;
+	GraphicsPipelineCreateInfo.pMultisampleState = &MultisampleStateInfo;
+	GraphicsPipelineCreateInfo.pColorBlendState = &ColorBlendState;
+	GraphicsPipelineCreateInfo.layout = this->PipelineLayout;
+	GraphicsPipelineCreateInfo.renderPass = this->RenderPass;
+	GraphicsPipelineCreateInfo.subpass = 0;
+
+	assert(!this->GraphicsPipeline);
+	VkResult CreateGraphicsPipelinesResult = vkCreateGraphicsPipelines(this->mainDevice.logicalDevice, VK_NULL_HANDLE, 1, &GraphicsPipelineCreateInfo, nullptr, &this->GraphicsPipeline);
+	if (CreateGraphicsPipelinesResult != VK_SUCCESS)
+		throw std::runtime_error("Failed to create graphics pipeline!");
+	assert(this->GraphicsPipeline);
 	
-
-
-
-
-
-
-
 	
-
-
 	// Destroy shader modules
 	vkDestroyShaderModule(this->mainDevice.logicalDevice, VSModule, nullptr);
 	vkDestroyShaderModule(this->mainDevice.logicalDevice, FSModule, nullptr);
+
+	
+	
 }
 

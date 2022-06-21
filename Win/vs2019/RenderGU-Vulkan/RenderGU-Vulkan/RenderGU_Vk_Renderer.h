@@ -100,6 +100,7 @@ struct RenderGU_Vk_Renderer
 	VkExtent2D ImageExtent;
 	VkRenderPass RenderPass = nullptr;
 	VkPipelineLayout PipelineLayout = nullptr;
+	VkPipeline GraphicsPipeline = nullptr;
 
 	VkShaderModule* VertexShaderModule = nullptr;
 	VkShaderModule* FragmentShaderModule = nullptr;

@@ -55,6 +55,7 @@ struct RenderGU_Vk_Renderer
 	void CreateImageViews();
 	void CreateRenderPass();
 	void CreateGraphicsPipeline();
+	void CreateFramebuffers();
 
 	void DestroyDebugMessenger();
 	void Cleanup();
@@ -101,6 +102,7 @@ struct RenderGU_Vk_Renderer
 	VkRenderPass RenderPass = nullptr;
 	VkPipelineLayout PipelineLayout = nullptr;
 	VkPipeline GraphicsPipeline = nullptr;
+	std::vector<VkFramebuffer> SwapchainFramebufferContainer;
 
 	VkShaderModule* VertexShaderModule = nullptr;
 	VkShaderModule* FragmentShaderModule = nullptr;

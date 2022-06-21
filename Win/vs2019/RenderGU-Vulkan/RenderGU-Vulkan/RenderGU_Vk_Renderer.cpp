@@ -17,6 +17,7 @@ int RenderGU_Vk_Renderer::Init(GLFWwindow* window)
 	CreateImageViews();
 	CreateRenderPass();
 	CreateGraphicsPipeline();
+	CreateFramebuffers();
 
 
 	return 0;
@@ -102,6 +103,9 @@ void RenderGU_Vk_Renderer::Cleanup()
 	while (count < this->SwapchainImageCount)
 		vkDestroyImageView(mainDevice.logicalDevice, ImageViewArray[count++], nullptr);
 
+	for (VkFramebuffer Framebuffer : SwapchainFramebufferContainer)
+		vkDestroyFramebuffer(mainDevice.logicalDevice, Framebuffer, nullptr);
+	
 	vkDestroyPipeline(mainDevice.logicalDevice, GraphicsPipeline, nullptr);
 	vkDestroyPipelineLayout(mainDevice.logicalDevice, PipelineLayout, nullptr);
 	vkDestroyRenderPass(mainDevice.logicalDevice, RenderPass, nullptr);
@@ -755,6 +759,31 @@ void RenderGU_Vk_Renderer::CreateGraphicsPipeline()
 	vkDestroyShaderModule(this->mainDevice.logicalDevice, VSModule, nullptr);
 	vkDestroyShaderModule(this->mainDevice.logicalDevice, FSModule, nullptr);
 
+	
+	
+}
+void RenderGU_Vk_Renderer::CreateFramebuffers()
+{
+	SwapchainFramebufferContainer.resize(std::size(this->ImageViewArray));
+
+	for (size_t i = 0; i < std::size(this->ImageViewArray); ++i)
+	{
+		VkImageView Attachments[] = {ImageViewArray[i]};
+
+		assert(this->RenderPass);
+		VkFramebufferCreateInfo FramebufferCreateInfo = {};
+		FramebufferCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+		FramebufferCreateInfo.renderPass = this->RenderPass;
+		FramebufferCreateInfo.attachmentCount = 1;
+		FramebufferCreateInfo.pAttachments = Attachments;
+		FramebufferCreateInfo.width = ImageExtent.width;
+		FramebufferCreateInfo.height = ImageExtent.height;
+		FramebufferCreateInfo.layers = 1;
+
+		if(vkCreateFramebuffer(this->mainDevice.logicalDevice, &FramebufferCreateInfo, nullptr, &SwapchainFramebufferContainer[i]) != VK_SUCCESS)
+			throw std::runtime_error("Failed to create Framebuffer!");
+
+	}
 	
 	
 }

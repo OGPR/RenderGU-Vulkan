@@ -18,6 +18,8 @@ int RenderGU_Vk_Renderer::Init(GLFWwindow* window)
 	CreateRenderPass();
 	CreateGraphicsPipeline();
 	CreateFramebuffers();
+	CreateCommandPool();
+	CreateCommandBuffers();
 
 
 	return 0;
@@ -105,7 +107,8 @@ void RenderGU_Vk_Renderer::Cleanup()
 
 	for (VkFramebuffer Framebuffer : SwapchainFramebufferContainer)
 		vkDestroyFramebuffer(mainDevice.logicalDevice, Framebuffer, nullptr);
-	
+
+	vkDestroyCommandPool(mainDevice.logicalDevice, CommandPool, nullptr);
 	vkDestroyPipeline(mainDevice.logicalDevice, GraphicsPipeline, nullptr);
 	vkDestroyPipelineLayout(mainDevice.logicalDevice, PipelineLayout, nullptr);
 	vkDestroyRenderPass(mainDevice.logicalDevice, RenderPass, nullptr);
@@ -785,6 +788,79 @@ void RenderGU_Vk_Renderer::CreateFramebuffers()
 
 	}
 	
+	
+}
+void RenderGU_Vk_Renderer::CreateCommandPool()
+{
+	assert(this->mainDevice.physicalDevice);
+	QueueFamilyIndices QueueFamilyIndices = GetQueueFamilyIndices(this->mainDevice.physicalDevice);
+
+	VkCommandPoolCreateInfo CommandPoolCreateInfo = {};
+	CommandPoolCreateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+	CommandPoolCreateInfo.queueFamilyIndex = QueueFamilyIndices.graphicsFamily;
+
+	assert(!this->CommandPool);
+	if (vkCreateCommandPool(this->mainDevice.logicalDevice, &CommandPoolCreateInfo, nullptr, &this->CommandPool) != VK_SUCCESS)
+		throw std::runtime_error("Failed to create command pool");
+	assert(this->CommandPool);
+
+	
+	
+	
+}
+void RenderGU_Vk_Renderer::CreateCommandBuffers()
+{
+	CommandBufferContainer.resize(std::size(this->SwapchainFramebufferContainer));
+
+	assert(this->CommandPool);
+	VkCommandBufferAllocateInfo CommandBufferAllocateInfo = {};
+	CommandBufferAllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+	CommandBufferAllocateInfo.commandPool = this->CommandPool;
+	CommandBufferAllocateInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+	CommandBufferAllocateInfo.commandBufferCount = static_cast<uint32_t>(std::size(CommandBufferContainer));
+
+	if (vkAllocateCommandBuffers(this->mainDevice.logicalDevice, &CommandBufferAllocateInfo, CommandBufferContainer.data()) != VK_SUCCESS)
+		throw std::runtime_error("Failed to allocate command buffers!");
+
+	for (size_t i = 0; i < std::size(CommandBufferContainer); ++i)
+	{
+		VkCommandBufferBeginInfo CommandBufferBeginInfo = {};
+		CommandBufferBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+
+		if (vkBeginCommandBuffer(CommandBufferContainer[i], &CommandBufferBeginInfo) != VK_SUCCESS)
+			throw std::runtime_error("failed to begin recording command buffer!");
+		
+		// Start a render pass
+		assert(this->RenderPass);
+
+		VkRenderPassBeginInfo RenderPassBeginInfo = {};
+		RenderPassBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+		RenderPassBeginInfo.renderPass = this->RenderPass;
+		RenderPassBeginInfo.framebuffer = SwapchainFramebufferContainer[i];
+		RenderPassBeginInfo.renderArea.offset = {0, 0 };
+		RenderPassBeginInfo.renderArea.extent = this->ImageExtent;
+		RenderPassBeginInfo.clearValueCount = 1;
+		
+		VkClearValue ClearValue = {0.0f, 0.0f, 0.0f, 1.0f};
+		RenderPassBeginInfo.pClearValues = &ClearValue;
+
+		// Returns void so no error handling here
+		vkCmdBeginRenderPass(CommandBufferContainer[i], &RenderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+		// Bind the graphics pipeline
+		assert(GraphicsPipeline);
+		vkCmdBindPipeline(CommandBufferContainer[i], VK_PIPELINE_BIND_POINT_GRAPHICS, this->GraphicsPipeline);
+
+		// Command to draw our triangle
+		vkCmdDraw(CommandBufferContainer[i], 3, 1, 0, 0);
+
+		vkCmdEndRenderPass(CommandBufferContainer[i]);
+
+		if (vkEndCommandBuffer(CommandBufferContainer[i]) != VK_SUCCESS)
+			throw std::runtime_error("Failed to record command buffer!");
+
+
+	}
 	
 }
 

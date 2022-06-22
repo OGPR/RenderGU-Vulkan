@@ -56,6 +56,8 @@ struct RenderGU_Vk_Renderer
 	void CreateRenderPass();
 	void CreateGraphicsPipeline();
 	void CreateFramebuffers();
+	void CreateCommandPool();
+	void CreateCommandBuffers();
 
 	void DestroyDebugMessenger();
 	void Cleanup();
@@ -103,6 +105,8 @@ struct RenderGU_Vk_Renderer
 	VkPipelineLayout PipelineLayout = nullptr;
 	VkPipeline GraphicsPipeline = nullptr;
 	std::vector<VkFramebuffer> SwapchainFramebufferContainer;
+	VkCommandPool CommandPool = nullptr;
+	std::vector<VkCommandBuffer> CommandBufferContainer;
 
 	VkShaderModule* VertexShaderModule = nullptr;
 	VkShaderModule* FragmentShaderModule = nullptr;

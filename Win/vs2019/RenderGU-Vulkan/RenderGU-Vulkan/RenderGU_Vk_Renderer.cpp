@@ -622,6 +622,18 @@ void RenderGU_Vk_Renderer::CreateRenderPass()
 	RenderPassCreateInfo.subpassCount = 1;
 	RenderPassCreateInfo.pSubpasses = &SubpassDescription;
 
+	//// Subpass dependencies
+	VkSubpassDependency SubpassDependency = {};
+	SubpassDependency.srcSubpass = VK_SUBPASS_EXTERNAL;
+	SubpassDependency.dstSubpass = 0;
+	SubpassDependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+	SubpassDependency.srcAccessMask = 0;
+	SubpassDependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+	SubpassDependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+
+	RenderPassCreateInfo.dependencyCount = 1;
+	RenderPassCreateInfo.pDependencies = &SubpassDependency;
+
 	assert(!this->RenderPass);
 	VkResult CreateRenderPassResult = vkCreateRenderPass(this->mainDevice.logicalDevice,
 		&RenderPassCreateInfo,
@@ -878,6 +890,8 @@ void RenderGU_Vk_Renderer::CreateSemaphores()
 	
 	if(vkCreateSemaphore(this->mainDevice.logicalDevice, &SemaphoreCreateInfo, nullptr, &RenderFinishedSemaphore) != VK_SUCCESS)
 		throw std::runtime_error("Failed to create RenderFinished semaphore");
+
+	
 		
 	assert(this->ImageAvailableSemaphore);
 	assert(this->RenderFinishedSemaphore);

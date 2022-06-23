@@ -20,6 +20,7 @@ int RenderGU_Vk_Renderer::Init(GLFWwindow* window)
 	CreateFramebuffers();
 	CreateCommandPool();
 	CreateCommandBuffers();
+	CreateSemaphores();
 
 
 	return 0;
@@ -108,6 +109,8 @@ void RenderGU_Vk_Renderer::Cleanup()
 	for (VkFramebuffer Framebuffer : SwapchainFramebufferContainer)
 		vkDestroyFramebuffer(mainDevice.logicalDevice, Framebuffer, nullptr);
 
+	vkDestroySemaphore(mainDevice.logicalDevice, ImageAvailableSemaphore, nullptr);
+	vkDestroySemaphore(mainDevice.logicalDevice, RenderFinishedSemaphore, nullptr);
 	vkDestroyCommandPool(mainDevice.logicalDevice, CommandPool, nullptr);
 	vkDestroyPipeline(mainDevice.logicalDevice, GraphicsPipeline, nullptr);
 	vkDestroyPipelineLayout(mainDevice.logicalDevice, PipelineLayout, nullptr);
@@ -862,5 +865,21 @@ void RenderGU_Vk_Renderer::CreateCommandBuffers()
 
 	}
 	
+}
+void RenderGU_Vk_Renderer::CreateSemaphores()
+{
+	VkSemaphoreCreateInfo SemaphoreCreateInfo = {};
+	SemaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+
+	assert(!this->ImageAvailableSemaphore);
+	assert(!this->RenderFinishedSemaphore);
+	if(vkCreateSemaphore(this->mainDevice.logicalDevice, &SemaphoreCreateInfo, nullptr, &ImageAvailableSemaphore) != VK_SUCCESS)
+		throw std::runtime_error("Failed to create ImageAvailable semaphore");
+	
+	if(vkCreateSemaphore(this->mainDevice.logicalDevice, &SemaphoreCreateInfo, nullptr, &RenderFinishedSemaphore) != VK_SUCCESS)
+		throw std::runtime_error("Failed to create RenderFinished semaphore");
+		
+	assert(this->ImageAvailableSemaphore);
+	assert(this->RenderFinishedSemaphore);
 }
 

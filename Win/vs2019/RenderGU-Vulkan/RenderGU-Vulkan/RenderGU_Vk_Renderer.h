@@ -58,6 +58,7 @@ struct RenderGU_Vk_Renderer
 	void CreateFramebuffers();
 	void CreateCommandPool();
 	void CreateCommandBuffers();
+	void CreateSemaphores();
 
 	void DestroyDebugMessenger();
 	void Cleanup();
@@ -107,6 +108,10 @@ struct RenderGU_Vk_Renderer
 	std::vector<VkFramebuffer> SwapchainFramebufferContainer;
 	VkCommandPool CommandPool = nullptr;
 	std::vector<VkCommandBuffer> CommandBufferContainer;
+
+	// Synchronisation variables
+	VkSemaphore ImageAvailableSemaphore= nullptr;
+	VkSemaphore RenderFinishedSemaphore = nullptr;
 
 	VkShaderModule* VertexShaderModule = nullptr;
 	VkShaderModule* FragmentShaderModule = nullptr;

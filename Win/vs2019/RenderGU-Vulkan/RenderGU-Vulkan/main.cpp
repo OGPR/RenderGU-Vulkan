@@ -161,6 +161,8 @@ int main(int argc, char** argv)
         DrawFrame(_RenderGU_Vk_Renderer);
     }
 
+    vkDeviceWaitIdle(_RenderGU_Vk_Renderer.mainDevice.logicalDevice);
+
     _RenderGU_Vk_Renderer.Cleanup();
 
     glfwDestroyWindow(window);

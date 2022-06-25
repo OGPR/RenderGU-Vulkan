@@ -84,6 +84,50 @@ bool clArgsRead(int argc,
     return false; // argc should never be < 1 but we put this here anyway
 }
 
+void DrawFrame(const RenderGU_Vk_Renderer& Renderer)
+{
+    // Acquire an image from renderer swapchain
+    uint32_t SwapchainImageIndex;
+    vkAcquireNextImageKHR(Renderer.mainDevice.logicalDevice, Renderer.swapchain, UINT64_MAX, Renderer.ImageAvailableSemaphore, VK_NULL_HANDLE, &SwapchainImageIndex);
+    
+    // Execute the renderer command buffer with image from 1. as attachment in the framebuffer
+    VkSubmitInfo SubmitInfo = {};
+    SubmitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+
+    //// Wait for Image to be available before trying to write colors to it
+    VkSemaphore WaitSemaphoreArray[] = {Renderer.ImageAvailableSemaphore};
+    VkPipelineStageFlags WaitPipelineStageArray[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
+
+    SubmitInfo.waitSemaphoreCount = 1;
+    SubmitInfo.pWaitSemaphores = WaitSemaphoreArray;
+    SubmitInfo.pWaitDstStageMask = WaitPipelineStageArray;
+
+    SubmitInfo.commandBufferCount = 1;
+    SubmitInfo.pCommandBuffers = &Renderer.CommandBufferContainer[SwapchainImageIndex];
+
+    VkSemaphore SignalSemaphoreArray[] = {Renderer.RenderFinishedSemaphore};
+    SubmitInfo.signalSemaphoreCount = 1;
+    SubmitInfo.pSignalSemaphores = SignalSemaphoreArray;
+
+    if (vkQueueSubmit(Renderer.graphicsQueue, 1, &SubmitInfo, VK_NULL_HANDLE) != VK_SUCCESS)
+        throw std::runtime_error("Failed to submit draw command buffer!");
+    
+    // Return the image to the to renderer swapchain for presentation
+    VkPresentInfoKHR PresentInfo = {};
+    PresentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+    PresentInfo.waitSemaphoreCount = 1;
+    PresentInfo.pWaitSemaphores = SignalSemaphoreArray;   //TODO Not WaitSemaphoreArray?
+
+    VkSwapchainKHR SwapChainArray[] = {Renderer.swapchain};
+    PresentInfo.swapchainCount = 1;
+    PresentInfo.pSwapchains = SwapChainArray;
+    PresentInfo.pImageIndices = &SwapchainImageIndex;
+
+    vkQueuePresentKHR(Renderer.presentationQueue, &PresentInfo);
+
+    vkQueueWaitIdle(Renderer.presentationQueue);
+}
+
 int main(int argc, char** argv)
 {
 	VulkanValidationDesiredMsgSeverity vulkanValidationDesiredMsgSeverity;
@@ -114,7 +158,10 @@ int main(int argc, char** argv)
     while (!glfwWindowShouldClose(window))
     {
         glfwPollEvents();
+        DrawFrame(_RenderGU_Vk_Renderer);
     }
+
+    vkDeviceWaitIdle(_RenderGU_Vk_Renderer.mainDevice.logicalDevice);
 
     _RenderGU_Vk_Renderer.Cleanup();
 

@@ -124,8 +124,8 @@ void DrawFrame(const RenderGU_Vk_Renderer& Renderer)
     PresentInfo.pImageIndices = &SwapchainImageIndex;
 
     vkQueuePresentKHR(Renderer.presentationQueue, &PresentInfo);
-    
-    
+
+    vkQueueWaitIdle(Renderer.presentationQueue);
 }
 
 int main(int argc, char** argv)
